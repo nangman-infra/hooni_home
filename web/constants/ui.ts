@@ -1,0 +1,2 @@
+export const MAX_CONTENT_WIDTH = 1024;
+export const SECTION_VERTICAL_PADDING = 64;
