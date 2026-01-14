@@ -5,6 +5,9 @@
 
 pipeline {
     agent any
+    options {
+        disableConcurrentBuilds() 
+    }
     triggers {
         pollSCM('*/3 * * * *') // 3분마다 체크
     }
@@ -122,4 +125,5 @@ pipeline {
         }
     }
 }
+
 
