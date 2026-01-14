@@ -5,6 +5,9 @@
 
 pipeline {
     agent any
+    triggers {
+        pollSCM('*/3 * * * *') // 3분마다 체크
+    }
 
     environment {
         // [기본 설정] Harbor 정보 (필수)
@@ -119,3 +122,4 @@ pipeline {
         }
     }
 }
+
