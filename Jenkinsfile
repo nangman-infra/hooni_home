@@ -117,13 +117,27 @@ pipeline {
         }
     }
 
-    // 빌드 후 로컬 이미지 청소
+    // 빌드 후 처리 (성공/실패 알림 및 로컬 이미지 청소)
     post {
+        // 1. 빌드 성공 시 알림
+        success {
+            mattermostSend (
+                color: 'good',
+                message: ":tada: 빌드 성공! 배포가 완료되었습니다.\n프로젝트: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n바로가기: ${env.BUILD_URL}"
+            )
+        }
+
+        // 2. 빌드 실패 시 알림
+        failure {
+            mattermostSend (
+                color: 'danger',
+                message: ":rotating_light: 빌드 실패... 로그를 확인해주세요.\n프로젝트: ${env.JOB_NAME} #${env.BUILD_NUMBER}\n바로가기: ${env.BUILD_URL}"
+            )
+        }
+
         always {
             sh "docker rmi ${HARBOR_URL}/${HARBOR_PROJECT}/${env.REPO_NAME}:${env.IMAGE_TAG} || true"
             sh "docker rmi ${HARBOR_URL}/${HARBOR_PROJECT}/${env.REPO_NAME}:latest || true"
         }
     }
 }
-
-
