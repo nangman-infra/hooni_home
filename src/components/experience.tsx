@@ -42,9 +42,9 @@ const experience = [
 
 export function Experience() {
     return (
-        <section id="experience" className="py-20 border-b border-border/40">
+        <section id="experience" className="py-12 md:py-20 border-b border-border/40">
             <Container>
-                <h2 className="mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Experience</h2>
+                <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Experience</h2>
                 <div className="space-y-8">
                     {experience.map((exp, i) => (
                         <div key={i} className="grid gap-2 md:grid-cols-[1fr_3fr]">

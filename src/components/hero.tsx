@@ -64,7 +64,7 @@ export function Hero() {
 
                             <div className="h-3 w-px bg-border/40" />
 
-                            <div className="grid grid-cols-3 gap-8 items-center place-items-center">
+                            <div className="flex flex-col md:grid md:grid-cols-3 gap-6 md:gap-8 items-center place-items-center w-full md:w-auto">
                                 <Link href="https://github.com/heishooni" target="_blank" className="flex justify-center w-full hover:scale-110 hover:text-foreground transition-all duration-500 ease-out will-change-transform">
                                     <Github className="h-5 w-5" />
                                     <span className="sr-only">GitHub</span>

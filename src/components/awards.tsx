@@ -11,9 +11,9 @@ const awards = [
 
 export function Awards() {
     return (
-        <section id="awards" className="py-20 border-b border-border/40">
+        <section id="awards" className="py-12 md:py-20 border-b border-border/40">
             <Container>
-                <h2 className="mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Awards</h2>
+                <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Awards</h2>
                 <div className="max-w-3xl mx-auto space-y-6">
                     {awards.map((item, i) => (
                         <div key={i} className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-2">

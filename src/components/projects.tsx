@@ -15,15 +15,15 @@ const projects = [
 
 export function Projects() {
     return (
-        <section id="projects" className="py-20 border-b border-border/40">
+        <section id="projects" className="py-12 md:py-20 border-b border-border/40">
             <Container>
-                <h2 className="mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Projects</h2>
+                <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Projects</h2>
                 <div className="space-y-12">
                     {projects.map((p, i) => (
                         <div key={i} className="flex flex-col gap-3">
                             <div className="flex items-baseline justify-between">
-                                <h3 className="text-xl font-bold text-foreground">
-                                    {p.title} <span className="font-normal text-muted-foreground text-base">— {p.description}</span>
+                                <h3 className="text-lg md:text-xl font-bold text-foreground leading-tight">
+                                    {p.title} <span className="block md:inline font-normal text-muted-foreground text-sm md:text-base mt-1 md:mt-0 md:ml-2">— {p.description}</span>
                                 </h3>
                                 <div className="flex gap-3 text-sm">
                                     {p.links.repo && (

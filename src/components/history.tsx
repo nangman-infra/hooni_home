@@ -33,9 +33,9 @@ const historyItems = [
 
 export function History() {
     return (
-        <section className="py-20 border-b border-border/40">
+        <section className="py-12 md:py-20 border-b border-border/40">
             <Container>
-                <h2 className="mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">History</h2>
+                <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">History</h2>
                 <div className="max-w-3xl mx-auto space-y-4">
                     {historyItems.map((item, i) => (
                         <div key={i} className="flex flex-col sm:flex-row gap-2 sm:gap-8 hover:bg-secondary/5 rounded-lg p-2 transition-colors">
