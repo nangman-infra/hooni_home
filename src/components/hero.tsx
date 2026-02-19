@@ -41,12 +41,12 @@ export function Hero() {
                         {/* 1. Name */}
                         {/* 1. Name */}
                         <h1 className="text-5xl font-bold tracking-tighter sm:text-6xl md:text-8xl text-foreground mb-5 select-none">
-                            JEONG Hee Hoon
+                            JEONG <br className="block md:hidden" /> Hee Hoon
                         </h1>
 
                         {/* 2. Identity / Position */}
-                        <h2 className="text-sm sm:text-lg md:text-2xl font-light text-muted-foreground tracking-[0.15em] md:tracking-[0.2em] uppercase opacity-90 pb-6 select-none whitespace-nowrap">
-                            Network & Cloud Infrastructure Engineer
+                        <h2 className="text-sm sm:text-lg md:text-2xl font-light text-muted-foreground tracking-[0.15em] md:tracking-[0.2em] uppercase opacity-90 pb-6 select-none md:whitespace-nowrap text-center">
+                            Network & Cloud Infrastructure <br className="block md:hidden" /> Engineer
                         </h2>
 
                         <p className="text-base md:text-xl font-light text-muted-foreground/80 tracking-widest pb-12 select-none">

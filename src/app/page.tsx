@@ -38,7 +38,7 @@ export default function Home() {
         - bg-background to cover it
         - shadow to create depth separation
       */}
-      <div id="experience" className="relative z-10 bg-background w-full mt-[100vh] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-0 mb-0">
+      <div id="experience" className="relative z-10 bg-background w-full mt-[100vh] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-0 mb-0 scroll-mt-20">
         <div className="bg-background">
 
           <Summary />
