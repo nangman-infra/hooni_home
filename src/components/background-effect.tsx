@@ -26,7 +26,7 @@ export function BackgroundEffect() {
         const connectionDistance = 150
         const mouseDistance = 200
 
-        let prevWidth = window.innerWidth
+        let prevWidth = 0
 
         const resize = () => {
             const currentWidth = window.innerWidth
