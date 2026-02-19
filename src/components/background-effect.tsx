@@ -26,15 +26,26 @@ export function BackgroundEffect() {
         const connectionDistance = 150
         const mouseDistance = 200
 
+        let prevWidth = window.innerWidth
+
         const resize = () => {
+            const currentWidth = window.innerWidth
             canvas.width = window.innerWidth
             canvas.height = window.innerHeight
-            initPoints()
+
+            // Only re-initialize points if width changes (e.g., rotation or desktop resize)
+            // This prevents the animation from resetting (stuttering) when the mobile address bar hides/shows
+            if (currentWidth !== prevWidth) {
+                initPoints()
+                prevWidth = currentWidth
+            }
         }
 
         const initPoints = () => {
             points = []
-            const numberOfPoints = Math.floor((canvas.width * canvas.height) / 15000)
+            // Reduce density slightly for better mobile performance
+            const density = window.innerWidth < 768 ? 20000 : 15000
+            const numberOfPoints = Math.floor((canvas.width * canvas.height) / density)
 
             for (let i = 0; i < numberOfPoints; i++) {
                 points.push({
