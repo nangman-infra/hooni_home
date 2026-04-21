@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowUpRight, Github } from "lucide-react"
+import { Github } from "lucide-react"
 import { Container } from "@/components/container"
 
 const projects = [

@@ -1,7 +1,6 @@
 "use client"
 
 import { motion, useScroll, useTransform } from "framer-motion"
-import { useRef } from "react"
 
 export function ResumeRevealWrapper({ children }: { children: React.ReactNode }) {
     const { scrollY } = useScroll()
