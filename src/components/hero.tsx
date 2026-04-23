@@ -3,10 +3,10 @@
 import { Container } from "@/components/container"
 import { BackgroundEffect } from "@/components/background-effect"
 import Link from "next/link"
-import { Github, Linkedin, ArrowDown } from "lucide-react"
+import { GithubIcon, LinkedinIcon, ArrowDown } from "lucide-react"
 
 // Custom wide icon for 'blog' text
-function BlogIcon({ className }: { className?: string }) {
+function BlogIcon({ className }: Readonly<{ className?: string }>) {
     return (
         <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -66,11 +66,11 @@ export function Hero() {
 
                             <div className="flex flex-col md:grid md:grid-cols-3 gap-6 md:gap-8 items-center place-items-center w-full md:w-auto">
                                 <Link href="https://github.com/heishooni" target="_blank" className="flex justify-center w-full hover:scale-110 hover:text-foreground transition-all duration-500 ease-out will-change-transform">
-                                    <Github className="h-5 w-5" />
+                                    <GithubIcon className="h-5 w-5" />
                                     <span className="sr-only">GitHub</span>
                                 </Link>
                                 <Link href="https://www.linkedin.com/in/%EC%A0%95%ED%9D%AC%ED%9B%88heishooni/" target="_blank" className="flex justify-center w-full hover:scale-110 hover:text-foreground transition-all duration-500 ease-out will-change-transform">
-                                    <Linkedin className="h-5 w-5" />
+                                    <LinkedinIcon className="h-5 w-5" />
                                     <span className="sr-only">LinkedIn</span>
                                 </Link>
                                 <Link href="https://heishooni.tistory.com/" target="_blank" className="flex justify-center w-full hover:scale-110 hover:text-foreground transition-all duration-500 ease-out will-change-transform">

@@ -183,6 +183,7 @@ pipeline {
                                 env.APP_DIRECTORY == '.' ? path : "${env.APP_DIRECTORY}/${path}"
                             }
                             env.SONAR_SOURCES = sourceDirs ? sourceDirs.join(',') : env.APP_DIRECTORY
+                            env.SONAR_COVERAGE_REPORT = env.APP_DIRECTORY == '.' ? 'coverage/lcov.info' : "${env.APP_DIRECTORY}/coverage/lcov.info"
 
                             writeFile(
                                 file: 'sonar-project.properties',
@@ -195,6 +196,7 @@ pipeline {
                                     sonar.scm.revision=${env.FULL_SHA}
                                     sonar.sources=${env.SONAR_SOURCES}
                                     sonar.exclusions=**/node_modules/**,**/.next/**,**/out/**,**/coverage/**,**/dist/**,**/*.config.*,**/next-env.d.ts
+                                    sonar.javascript.lcov.reportPaths=${env.SONAR_COVERAGE_REPORT}
                                     sonar.javascript.node.maxspace=4096
                                 """.stripIndent().trim() + '\n'
                             )

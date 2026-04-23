@@ -10,6 +10,12 @@ interface Point {
     radius: number
 }
 
+function randomFloat() {
+    const values = new Uint32Array(1)
+    globalThis.crypto.getRandomValues(values)
+    return values[0] / (0xffffffff + 1)
+}
+
 export function BackgroundEffect() {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const mouseRef = useRef({ x: 0, y: 0 })
@@ -49,11 +55,11 @@ export function BackgroundEffect() {
 
             for (let i = 0; i < numberOfPoints; i++) {
                 points.push({
-                    x: Math.random() * canvas.width,
-                    y: Math.random() * canvas.height,
-                    vx: (Math.random() - 0.5) * 0.5, // Slow velocity
-                    vy: (Math.random() - 0.5) * 0.5,
-                    radius: Math.random() * 1.5 + 0.5
+                    x: randomFloat() * canvas.width,
+                    y: randomFloat() * canvas.height,
+                    vx: (randomFloat() - 0.5) * 0.5, // Slow velocity
+                    vy: (randomFloat() - 0.5) * 0.5,
+                    radius: randomFloat() * 1.5 + 0.5
                 })
             }
         }
@@ -74,7 +80,7 @@ export function BackgroundEffect() {
                 // Mouse interaction
                 const dx = mouseRef.current.x - point.x
                 const dy = mouseRef.current.y - point.y
-                const distance = Math.sqrt(dx * dx + dy * dy)
+                const distance = Math.hypot(dx, dy)
 
                 if (distance < mouseDistance) {
                     // Gentle push away from mouse
@@ -99,7 +105,7 @@ export function BackgroundEffect() {
                     const other = points[j]
                     const dx = point.x - other.x
                     const dy = point.y - other.y
-                    const distance = Math.sqrt(dx * dx + dy * dy)
+                    const distance = Math.hypot(dx, dy)
 
                     if (distance < connectionDistance) {
                         const opacity = 1 - (distance / connectionDistance)

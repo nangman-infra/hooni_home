@@ -4,7 +4,7 @@ interface ContainerProps extends React.HTMLAttributes<HTMLDivElement> {
     children: React.ReactNode
 }
 
-export function Container({ className, children, ...props }: ContainerProps) {
+export function Container({ className, children, ...props }: Readonly<ContainerProps>) {
     return (
         <div
             className={cn(

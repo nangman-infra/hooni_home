@@ -2,7 +2,7 @@
 
 import { motion, useScroll, useTransform } from "framer-motion"
 
-export function ResumeRevealWrapper({ children }: { children: React.ReactNode }) {
+export function ResumeRevealWrapper({ children }: Readonly<{ children: React.ReactNode }>) {
     const { scrollY } = useScroll()
 
     // Counter-scroll logic:

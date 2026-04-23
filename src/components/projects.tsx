@@ -1,9 +1,10 @@
 import Link from "next/link"
-import { Github } from "lucide-react"
+import { GithubIcon } from "lucide-react"
 import { Container } from "@/components/container"
 
 const projects = [
     {
+        id: "nangman-hybrid-network",
         title: "Nangman Hybrid Network",
         description: "Hybrid Cloud Network Architecture",
         role: "Network / Infrastructure Engineer",
@@ -19,16 +20,17 @@ export function Projects() {
             <Container>
                 <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Projects</h2>
                 <div className="space-y-12">
-                    {projects.map((p, i) => (
-                        <div key={i} className="flex flex-col gap-3">
+                    {projects.map((p) => (
+                        <div key={p.id} className="flex flex-col gap-3">
                             <div className="flex items-baseline justify-between">
                                 <h3 className="text-lg md:text-xl font-bold text-foreground leading-tight">
-                                    {p.title} <span className="block md:inline font-normal text-muted-foreground text-sm md:text-base mt-1 md:mt-0 md:ml-2">— {p.description}</span>
+                                    {p.title}
+                                    <span className="block md:inline font-normal text-muted-foreground text-sm md:text-base mt-1 md:mt-0 md:ml-2">{" — "}{p.description}</span>
                                 </h3>
                                 <div className="flex gap-3 text-sm">
                                     {p.links.repo && (
                                         <Link href={p.links.repo} target="_blank" className="hover:text-foreground transition-colors text-muted-foreground">
-                                            <Github className="h-5 w-5" />
+                                            <GithubIcon className="h-5 w-5" />
                                             <span className="sr-only">GitHub</span>
                                         </Link>
                                     )}

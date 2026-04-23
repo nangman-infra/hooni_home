@@ -2,6 +2,7 @@ import { Container } from "@/components/container"
 
 const experience = [
     {
+        id: "nangman-infra-team",
         title: "Nangman Infra Team",
         role: "Network Mentee",
         period: "2025.12 - Present",
@@ -12,6 +13,7 @@ const experience = [
         ]
     },
     {
+        id: "likelion-13th",
         title: "멋쟁이 사자처럼 13기",
         role: "Backend Developer",
         period: "2025.03 - 2025.12",
@@ -22,6 +24,7 @@ const experience = [
         ]
     },
     {
+        id: "wisoft-lab",
         title: (
             <span>
                 WiSoft Lab
@@ -46,16 +49,16 @@ export function Experience() {
             <Container>
                 <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Experience</h2>
                 <div className="space-y-8">
-                    {experience.map((exp, i) => (
-                        <div key={i} className="grid gap-2 md:grid-cols-[1fr_3fr]">
+                    {experience.map((exp) => (
+                        <div key={exp.id} className="grid gap-2 md:grid-cols-[1fr_3fr]">
                             <div>
                                 <h3 className="font-bold text-foreground">{exp.title}</h3>
                                 <p className="text-sm text-muted-foreground">{exp.role}</p>
                                 <p className="text-sm text-muted-foreground font-mono mt-1">{exp.period}</p>
                             </div>
                             <ul className="list-disc list-outside ml-4 space-y-1 text-foreground/90 leading-relaxed text-sm md:text-base">
-                                {exp.achievements.map((ach, j) => (
-                                    <li key={j}>{ach}</li>
+                                {exp.achievements.map((ach) => (
+                                    <li key={ach}>{ach}</li>
                                 ))}
                             </ul>
                         </div>
