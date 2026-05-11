@@ -27,6 +27,11 @@ const historyItems = [
         content: "공공데이터 활용 공모전 대상 수상 (한국조폐공사 부문)"
     },
     {
+        id: "nangman-infra",
+        date: "2025.12 ~",
+        content: "낭만 인프라"
+    },
+    {
         id: "vice-president",
         date: "2025.01 ~ 2025.12",
         content: "한밭대학교 모바일융합공학과 부학생회장"

@@ -9,15 +9,47 @@ function GitHubBrandIcon({ className }: Readonly<{ className?: string }>) {
     )
 }
 
+function BlogIcon({ className }: Readonly<{ className?: string }>) {
+    return (
+        <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 52 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+        >
+            <text x="50%" y="19" textAnchor="middle" fontSize="20" fontWeight="bold" stroke="none" fill="currentColor" letterSpacing="-1">blog</text>
+        </svg>
+    )
+}
+
 const projects = [
     {
         id: "nangman-hybrid-network",
         title: "Nangman Hybrid Network",
         description: "Hybrid Cloud Network Architecture",
-        role: "Network / Infrastructure Engineer",
-        impact: "대전–서울 간 CIDR 대역 중복 문제를 WireGuard Overlay로 해결하고, 서울 OPNsense 단일 인바운드와 도메인 기반 Reverse Proxy 라우팅을 적용해 멀티사이트(대전/서울/AWS) 트래픽 경로를 중앙화",
-        stack: "OPNsense, WireGuard, IPsec VPN, Nginx Proxy Manager, AWS(VPC)",
-        links: { repo: "https://github.com/heishooni/Nangman-Infra-Network", demo: "" }
+        summary: "대전–서울 간 CIDR 대역 중복 문제를 WireGuard Overlay로 해소하고, 서울 OPNsense 단일 인바운드와 도메인 기반 Reverse Proxy 라우팅을 결합해 멀티사이트(대전/서울/AWS) 트래픽 경로를 중앙화한 하이브리드 네트워크 아키텍처 설계",
+        stack: ["OPNsense", "WireGuard", "IPsec VPN", "Nginx Proxy Manager", "AWS(VPC)"],
+        links: { repo: "https://github.com/heishooni/Nangman-Infra-Network" }
+    },
+    {
+        id: "personal-workspace-lab",
+        title: "개인 워크스페이스 Proxmox · OPNsense · Cisco CML 랩 구축",
+        description: "Network Virtualization & Infrastructure Lab",
+        summary: "개인 서버 환경에 Proxmox, OPNsense, Cisco CML을 구성해 방화벽·라우팅·VPN·가상 네트워크 실습이 가능한 인프라 랩 환경 구축, 낭만 인프라 네트워크와의 IPsec 연동, Teleport 기반 Cisco CML 서비스 등록",
+        stack: ["Proxmox", "OPNsense", "Cisco CML", "IPsec", "Teleport", "Linux"],
+        links: { blog: "https://heishooni.tistory.com/category/Infra" }
+    },
+    {
+        id: "ai-tcp-udp-streaming",
+        title: "AI 기반 TCP/UDP 영상 스트리밍 프로토콜 비교 프로젝트",
+        description: "Network Protocol Analysis with AI",
+        summary: "AI 기반 바이브 코딩 방식으로 TCP/UDP 영상 스트리밍 구조를 직접 구현하고, 전송 안정성·지연 시간·패킷 손실·실시간성 관점에서 각 프로토콜의 특성과 트레이드오프를 비교 분석한 네트워크 실습 프로젝트",
+        stack: ["TCP", "UDP", "Vibe Coding", "Network Protocol Analysis"],
+        links: { blog: "https://heishooni.tistory.com/6" }
     }
 ]
 
@@ -28,15 +60,23 @@ export function Projects() {
                 <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Projects</h2>
                 <div className="space-y-12">
                     {projects.map((p) => (
-                        <div key={p.id} className="flex flex-col gap-3">
-                            <div className="flex items-baseline justify-between">
+                        <div key={p.id} className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
                                 <h3 className="text-lg md:text-xl font-bold text-foreground leading-tight">
                                     {p.title}
-                                    <span className="block md:inline font-normal text-muted-foreground text-sm md:text-base mt-1 md:mt-0 md:ml-2">{" — "}{p.description}</span>
+                                    <span className="mt-2 block text-sm md:text-base font-normal text-muted-foreground leading-relaxed">
+                                        {p.description}
+                                    </span>
                                 </h3>
-                                <div className="flex gap-3 text-sm">
+                                <div className="flex items-center gap-3 text-sm text-muted-foreground md:shrink-0">
+                                    {p.links.blog && (
+                                        <Link href={p.links.blog} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
+                                            <BlogIcon className="h-5 w-auto" />
+                                            <span className="sr-only">Blog</span>
+                                        </Link>
+                                    )}
                                     {p.links.repo && (
-                                        <Link href={p.links.repo} target="_blank" className="hover:text-foreground transition-colors text-muted-foreground">
+                                        <Link href={p.links.repo} target="_blank" rel="noopener noreferrer" className="hover:text-foreground transition-colors">
                                             <GitHubBrandIcon className="h-5 w-5" />
                                             <span className="sr-only">GitHub</span>
                                         </Link>
@@ -44,15 +84,14 @@ export function Projects() {
                                 </div>
                             </div>
 
-                            <div className="grid gap-2 text-sm md:grid-cols-[120px_1fr]">
-                                <span className="text-muted-foreground font-medium">Role</span>
-                                <span className="text-foreground">{p.role}</span>
+                            <p className="text-foreground/90 font-medium leading-relaxed">{p.summary}</p>
 
-                                <span className="text-muted-foreground font-medium">Impact</span>
-                                <span className="text-foreground font-medium">{p.impact}</span>
-
-                                <span className="text-muted-foreground font-medium">Stack</span>
-                                <span className="text-muted-foreground">{p.stack}</span>
+                            <div className="flex flex-wrap gap-2">
+                                {p.stack.map((item) => (
+                                    <span key={item} className="rounded-full border border-border/60 px-3 py-1.5 text-sm text-muted-foreground">
+                                        {item}
+                                    </span>
+                                ))}
                             </div>
                         </div>
                     ))}
