@@ -6,6 +6,7 @@ def WEBHOOK_TRIGGER_TOKEN_CREDENTIAL_ID = 'GITHUB_WEBHOOK_TRIGGER_TOKEN'
 def REPO_SLUG = 'nangman-infra/hooni_home'
 def MAIN_BRANCH_REF = 'refs/heads/main'
 def DEFAULT_REPO_HTTP_URL = 'https://github.com/nangman-infra/hooni_home.git'
+def PNPM_VERSION = '10.26.1'
 
 pipeline {
     agent none
@@ -138,6 +139,7 @@ pipeline {
                             node --version
                             corepack --version
                             corepack enable
+                            corepack prepare pnpm@''' + PNPM_VERSION + ''' --activate
                             pnpm --version
                             pnpm install --frozen-lockfile
                         '''
