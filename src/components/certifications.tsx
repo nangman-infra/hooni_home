@@ -4,13 +4,19 @@ const certs = [
     {
         id: "sqld",
         name: "SQLD",
-        issuer: "한국데이터산업진흥원",
+        issuer: "SQL Developer",
         label: "Database"
+    },
+    {
+        id: "adsp",
+        name: "ADSP",
+        issuer: "데이터분석 준전문가",
+        label: "Data"
     },
     {
         id: "ncp-associate",
         name: "NAVER Cloud Platform Certified Associate",
-        issuer: "NAVER Cloud",
+        issuer: "네이버 클라우드 플랫폼",
         label: "Cloud"
     }
 ]
@@ -20,7 +26,7 @@ export function Certifications() {
         <section id="certifications" className="py-12 md:py-20 border-b border-border/40">
             <Container>
                 <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Certifications</h2>
-                <ul className="grid gap-4 md:grid-cols-2 max-w-4xl mx-auto">
+                <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
                     {certs.map((cert) => (
                         <li key={cert.id} className="rounded-2xl border border-border/60 bg-secondary/5 p-5 transition-colors duration-300 hover:bg-secondary/10">
                             <div className="flex items-start justify-between gap-3">
