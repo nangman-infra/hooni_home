@@ -29,11 +29,11 @@ export function Certifications() {
                 <ul className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 max-w-5xl mx-auto">
                     {certs.map((cert) => (
                         <li key={cert.id} className="rounded-2xl border border-border/60 bg-secondary/5 p-5 transition-colors duration-300 hover:bg-secondary/10">
-                            <div className="flex items-start justify-between gap-3">
-                                <div>
-                                    <h3 className="text-base md:text-lg font-semibold leading-snug text-foreground">{cert.name}</h3>
-                                </div>
-                                <span className="rounded-full border border-border/60 bg-background px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+                            <div className="space-y-4">
+                                <h3 className="text-base md:text-lg font-semibold leading-snug text-foreground text-pretty">
+                                    {cert.name}
+                                </h3>
+                                <span className="inline-flex rounded-full border border-border/60 bg-background px-3 py-1 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
                                     {cert.label}
                                 </span>
                             </div>
