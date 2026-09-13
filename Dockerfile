@@ -15,6 +15,12 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
+# Build stamp for the footer (see next.config.ts); Jenkins passes both.
+ARG GIT_SHA=
+ARG BUILD_TIME=
+ENV GIT_SHA=$GIT_SHA
+ENV BUILD_TIME=$BUILD_TIME
+
 ENV NEXT_TELEMETRY_DISABLED=1
 RUN pnpm build
 

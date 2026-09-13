@@ -2,61 +2,48 @@
 
 import { Nav } from "@/components/nav";
 import { Hero } from "@/components/hero";
+import { LightField } from "@/components/light-field";
+import { Scene } from "@/components/scene";
+import { Spine } from "@/components/spine";
 import { Summary } from "@/components/summary";
 import { History } from "@/components/history";
 import { TechStack } from "@/components/tech-stack";
-import { Projects } from "@/components/projects";
+import { ProjectScene, projectCount } from "@/components/projects";
 import { Experience } from "@/components/experience";
 import { Awards } from "@/components/awards";
 import { Education } from "@/components/education";
 import { Certifications } from "@/components/certifications";
 import { Footer } from "@/components/footer";
 
+// One full-screen scene per section; projects get one scene each.
+const scenes: { id?: string; title: string; node: React.ReactNode }[] = [
+  { title: "Summary", node: <Summary /> },
+  { title: "History", node: <History /> },
+  { id: "skills", title: "Core Focus", node: <TechStack /> },
+  ...Array.from({ length: projectCount }, (_, i) => ({ id: i === 0 ? "projects" : undefined, title: `Project ${i + 1}`, node: <ProjectScene index={i} /> })),
+  { id: "experience", title: "Experience", node: <Experience /> },
+  { id: "awards", title: "Awards", node: <Awards /> },
+  { id: "education", title: "Education", node: <Education /> },
+  { id: "certifications", title: "Certifications", node: <Certifications /> },
+  { title: "Contact", node: <Footer /> },
+]
+
 export default function Home() {
   return (
-    // MAIN: Standard Relative Flow
-    // Hero is FIXED (in its component or here).
-    // Resume has MARGIN-TOP to start below the hero.
-    // min-h-[200vh] ensures there is enough scroll space for the transition.
-    <main className="relative bg-background text-foreground antialiased selection:bg-foreground selection:text-background min-h-[200vh]">
+    // Hero is fixed behind; the scenes slide over it (mt-[100vh]). Below 1024px the hero flows normally.
+    <main className="relative bg-background text-foreground antialiased selection:bg-foreground selection:text-background">
       <Nav />
-
-      {/* 
-        1. Hero Section (Fixed Background)
-        - Needs to be fixed to stay behind.
-        - inset-0 ensures it covers the viewport.
-        - z-0 to sit behind the resume.
-      */}
-      <div className="fixed inset-0 h-screen w-full z-0">
+      <div className="fixed inset-0 h-screen w-full z-0 max-lg:relative max-lg:inset-auto max-lg:h-auto">
         <Hero />
       </div>
-
-      {/* 
-        2. Resume Content (Slides Over)
-        - margin-top-[100vh] ensures it starts exactly below the fold
-        - z-10 to slide OVER the hero
-        - bg-background to cover it
-        - shadow to create depth separation
-      */}
-      <div id="experience" className="relative z-10 bg-background w-full mt-[100vh] shadow-[0_-10px_40px_-15px_rgba(0,0,0,0.1)] pb-0 mb-0 scroll-mt-20">
-        <div className="bg-background">
-
-          <Summary />
-          <History />
-          <TechStack />
-          <Projects />
-          <Experience />
-          <Awards />
-          <Education />
-          <Certifications />
-        </div>
-
-        {/* Footer in its own solid container to cover bottom */}
-        {/* Extended padding-bottom ensures overscroll doesn't reveal hero */}
-        <div className="bg-background relative z-20">
-          <Footer />
-        </div>
+      <div id="resume" className="relative z-10 w-full mt-[100vh] max-lg:mt-0 scroll-mt-20 bg-background shadow-[0_-30px_80px_-40px_var(--lift)] max-lg:shadow-none">
+        {/* the same ground of light the hero stands on, carried under the whole resume */}
+        <div className="fixed inset-0 z-0 pointer-events-none"><LightField calm /></div>
+        {scenes.map((s, i) => (
+          <Scene key={i} id={s.id} title={s.title}>{s.node}</Scene>
+        ))}
       </div>
+      <Spine />
     </main>
   );
 }

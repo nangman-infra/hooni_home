@@ -1,4 +1,5 @@
 import { Container } from "@/components/container"
+import { SectionHead } from "@/components/section-head"
 
 const awards = [
     {
@@ -9,27 +10,21 @@ const awards = [
         issuer: "한국조폐공사 (KOMSCO)"
     }
 ]
-
+// The grade is the whole point, so it is the biggest thing on the page.
 export function Awards() {
     return (
-        <section id="awards" className="py-12 md:py-20 border-b border-border/40">
-            <Container>
-                <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Awards</h2>
-                <div className="max-w-3xl mx-auto space-y-6">
-                    {awards.map((item) => (
-                        <div key={item.id} className="flex flex-col sm:flex-row sm:justify-between sm:items-baseline gap-2">
-                            <div>
-                                <h3 className="font-bold text-foreground text-lg">{item.name}</h3>
-                                <p className="text-muted-foreground">{item.issuer}</p>
-                            </div>
-                            <div className="text-right sm:text-left">
-                                <p className="text-foreground font-medium">{item.grade}</p>
-                                <p className="text-sm text-muted-foreground/80">{item.date}</p>
-                            </div>
-                        </div>
-                    ))}
+        <Container>
+            <SectionHead title="Awards" />
+            {awards.map((item) => (
+                <div key={item.id} className="mt-10 grid gap-6 md:mt-14 md:grid-cols-[7fr_5fr] md:items-end md:gap-12">
+                    <p className="title-ko text-[clamp(3.4rem,9vw,8rem)] leading-[0.95] text-foreground">{item.grade}</p>
+                    <div className="md:pb-3">
+                        <h3 className="text-xl md:text-2xl font-bold tracking-tight text-foreground text-balance">{item.name}</h3>
+                        <p className="mt-2 text-muted-foreground">{item.issuer}</p>
+                        <p className="mono mt-3 text-xs text-muted-foreground/80">{item.date}</p>
+                    </div>
                 </div>
-            </Container>
-        </section>
+            ))}
+        </Container>
     )
 }

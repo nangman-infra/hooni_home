@@ -1,4 +1,6 @@
+import type { CSSProperties } from "react"
 import { Container } from "@/components/container"
+import { SectionHead } from "@/components/section-head"
 
 const historyItems = [
     {
@@ -43,20 +45,28 @@ const historyItems = [
     }
 ]
 
+// The line draws down and each entry lights as it is reached.
 export function History() {
     return (
-        <section className="py-12 md:py-20 border-b border-border/40">
-            <Container>
-                <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">History</h2>
-                <div className="max-w-3xl mx-auto space-y-4">
-                    {historyItems.map((item) => (
-                        <div key={item.id} className="flex flex-col sm:flex-row gap-2 sm:gap-8 hover:bg-secondary/5 rounded-lg p-2 transition-colors">
-                            <span className="text-muted-foreground font-mono text-sm sm:w-32 flex-shrink-0">{item.date}</span>
-                            <span className="text-foreground/90 font-medium">{item.content}</span>
+        <Container>
+            <div className="grid gap-10 lg:grid-cols-[5fr_7fr] lg:gap-16 lg:items-center">
+                {/* the years are what the list is measured against, so only they sit in the row's
+                    middle — the heading rides above them and out of the centring. */}
+                <div className="relative">
+                    <div className="mb-8 lg:absolute lg:bottom-full lg:left-0 lg:mb-10"><SectionHead title="History" /></div>
+                    <p className="big-year"><span>2024</span><em aria-hidden="true">&rarr;</em><span>2026</span></p>
+                </div>
+                <div className="tl ml-6">
+                    <span className="tl-line" aria-hidden="true" />
+                    {historyItems.map((item, i) => (
+                        <div key={item.id} className="tl-item grid gap-0.5 sm:grid-cols-[8.5rem_1fr] sm:gap-6" style={{ "--i": i } as CSSProperties}>
+                            <span className="tl-dot" aria-hidden="true" />
+                            <span className="mono text-xs text-muted-foreground pt-0.5">{item.date}</span>
+                            <span className="text-foreground/90 font-medium text-[0.9375rem] md:text-base">{item.content}</span>
                         </div>
                     ))}
                 </div>
-            </Container>
-        </section>
+            </div>
+        </Container>
     )
 }

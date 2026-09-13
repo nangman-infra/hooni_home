@@ -1,4 +1,5 @@
 import { Container } from "@/components/container"
+import { SectionHead } from "@/components/section-head"
 
 const experience = [
     {
@@ -25,14 +26,8 @@ const experience = [
     },
     {
         id: "wisoft-lab",
-        title: (
-            <span>
-                WiSoft Lab
-                <span className="block text-sm font-normal text-muted-foreground mt-0.5">
-                    (무선통신 소프트웨어 연구실)
-                </span>
-            </span>
-        ),
+        title: "WiSoft Lab",
+        subtitle: "(무선통신 소프트웨어 연구실)",
         role: "Undergraduate Researcher",
         period: "2025.01 - Present",
         achievements: [
@@ -43,28 +38,30 @@ const experience = [
     }
 ]
 
+// A ledger: period in the margin, the organisation and what was done beside it.
 export function Experience() {
     return (
-        <section id="experience" className="py-12 md:py-20 border-b border-border/40">
-            <Container>
-                <h2 className="mb-8 md:mb-12 text-sm font-bold text-muted-foreground uppercase tracking-widest text-center">Experience</h2>
-                <div className="space-y-8">
-                    {experience.map((exp) => (
-                        <div key={exp.id} className="grid gap-2 md:grid-cols-[1fr_3fr]">
-                            <div>
-                                <h3 className="font-bold text-foreground">{exp.title}</h3>
-                                <p className="text-sm text-muted-foreground">{exp.role}</p>
-                                <p className="text-sm text-muted-foreground font-mono mt-1">{exp.period}</p>
+        <Container>
+            <SectionHead title="Experience" />
+            <div className="mt-8 md:mt-12">
+                {experience.map((exp) => (
+                    <div key={exp.id} className="grid gap-2 border-t border-foreground/10 py-6 md:grid-cols-[11rem_1fr] md:gap-10 md:py-8">
+                        <span className="mono text-xs text-muted-foreground md:pt-2.5">{exp.period}</span>
+                        <div>
+                            <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                                <h3 className="text-2xl md:text-3xl font-bold tracking-tight text-foreground">{exp.title}</h3>
+                                {exp.subtitle && <span className="text-sm text-muted-foreground">{exp.subtitle}</span>}
                             </div>
-                            <ul className="list-disc list-outside ml-4 space-y-1 text-foreground/90 leading-relaxed text-sm md:text-base">
+                            <p className="mt-1 text-sm md:text-base text-muted-foreground">{exp.role}</p>
+                            <ul className="mt-4 max-w-2xl list-disc list-outside ml-4 space-y-1.5 text-[0.9375rem] leading-relaxed text-foreground/85">
                                 {exp.achievements.map((ach) => (
                                     <li key={ach}>{ach}</li>
                                 ))}
                             </ul>
                         </div>
-                    ))}
-                </div>
-            </Container>
-        </section>
+                    </div>
+                ))}
+            </div>
+        </Container>
     )
 }

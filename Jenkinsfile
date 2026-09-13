@@ -281,6 +281,8 @@ pipeline {
                                         "--label org.opencontainers.image.revision=${env.FULL_SHA}",
                                         "--label org.opencontainers.image.source=${env.REPO_HTTP_URL}",
                                         "--label org.opencontainers.image.version=${env.IMAGE_TAG}",
+                                        "--build-arg GIT_SHA=${env.SHORT_SHA}",
+                                        "--build-arg BUILD_TIME=${env.BUILD_TIMESTAMP}",
                                         "--pull",
                                         "--push",
                                         "--progress=plain",

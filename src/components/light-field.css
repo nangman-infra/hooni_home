@@ -1,0 +1,65 @@
+/* The light behind everything: broad washes of colour bending slowly past each other. Nothing here
+   reacts to the pointer — it runs so the panes of the map always have something passing behind them,
+   which is the only reason glass looks like glass. Soft radial gradients, so there is no filter to
+   repaint; only transform and opacity move, which the compositor handles. */
+.light-field {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    /* dark carries the theme's amber all the way through — the colour the map already shows when the
+       light passes behind Daejeon. --base is a flat wash over the whole page beneath the drifting
+       ones, so light is found everywhere, not only where a drift happens to be passing. */
+    --base: rgb(240 179 62 / 0.11);
+    --a: rgb(240 179 62 / 0.3);
+    --b: rgb(255 150 70 / 0.24);
+    --c: rgb(255 206 128 / 0.26);
+    --d: rgb(255 228 178 / 0.2);
+    --e: rgb(255 244 222 / 0.2);
+    background: var(--base);
+}
+.light-field i {
+    position: absolute;
+    left: var(--x);
+    top: var(--y);
+    width: var(--w);
+    height: var(--h);
+    margin: calc(var(--h) / -2) 0 0 calc(var(--w) / -2);
+    border-radius: 50%;
+    opacity: var(--o);
+    will-change: transform, opacity;
+    animation: wash var(--dur) ease-in-out var(--at) infinite alternate;
+}
+.light-field .w-a { background: radial-gradient(closest-side, var(--a), transparent); }
+.light-field .w-b { background: radial-gradient(closest-side, var(--b), transparent); }
+.light-field .w-c { background: radial-gradient(closest-side, var(--c), transparent); }
+.light-field .w-d { background: radial-gradient(closest-side, var(--d), transparent); }
+.light-field .w-e { background: radial-gradient(closest-side, var(--e), transparent); }
+@keyframes wash {
+    to { transform: translate(var(--dx), var(--dy)) scale(var(--sc)); opacity: calc(var(--o) * 0.5); }
+}
+
+/* The hero keeps only a breath of it: the glass needs something behind it, not a colour wash. */
+.light-field.hush i { opacity: calc(var(--o) * 0.4); }
+.light-field.hush { background: color-mix(in oklab, var(--base) 35%, transparent); }
+
+/* Half strength behind the resume, where the light sits under type rather than under glass. */
+.light-field.calm i { opacity: calc(var(--o) * 0.42); }
+.light-field.calm { background: color-mix(in oklab, var(--base) 45%, transparent); }
+
+/* The journey: the whole field also travels with the scroll, so the light at the last screen is not
+   the light at the first. `translate` is its own property, so it rides alongside the drift's
+   transform instead of fighting it. Browsers without scroll timelines simply keep the drift. */
+@supports (animation-timeline: scroll()) {
+    .light-field i {
+        animation: wash var(--dur) ease-in-out var(--at) infinite alternate, travel linear both;
+        animation-timeline: auto, scroll(root);
+        animation-range: normal, 0 100%;
+    }
+    @keyframes travel { to { translate: calc(var(--dx) * -2.2) calc(-38vh - var(--dy) * 3); } }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .light-field i { animation: none !important; translate: none !important; }
+}
