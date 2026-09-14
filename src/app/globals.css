@@ -5,6 +5,12 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Breakpoints at 2/3 of Tailwind's, to match the 67%-zoom page scale set in sections.css. */
+  --breakpoint-sm: 26.6875rem;  /* 427px, was 640 */
+  --breakpoint-md: 32rem;       /* 512px, was 768 */
+  --breakpoint-lg: 42.6875rem;  /* 683px, was 1024 */
+  --breakpoint-xl: 53.375rem;   /* 854px, was 1280 */
+  --breakpoint-2xl: 64rem;      /* 1024px, was 1536 */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);

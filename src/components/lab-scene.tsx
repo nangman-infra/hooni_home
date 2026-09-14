@@ -67,10 +67,10 @@ export function LabScene() {
                 <text className="fade" x="394" y="304" style={v({ "--d": "2.5s" })}>you</text>
                 <text className="tag addr fade" x="470" y="326" textAnchor="end" style={v({ "--d": "2.5s" })}>https, cml.console.nangman.cloud</text>
 
-                <circle className="pk" r="3.4" style={v({ offsetPath: `path("${IN}")`, "--dur": "7s", "--d": "2.8s" })} />
-                <circle className="pk hollow" r="3.4" style={v({ offsetPath: `path("${OUT}")`, "--dur": "7s", "--d": "6.3s" })} />
-                <circle className="pk hollow" r="3" style={v({ offsetPath: 'path("M90 146 V210")', "--dur": "8s", "--d": "4s" })} />
-                <circle className="pk hollow" r="3" style={v({ offsetPath: 'path("M118 146 V190 H234 V210")', "--dur": "8s", "--d": "5.5s" })} />
+                <rect className="pk" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${IN}")`, "--dur": "7s", "--d": "2.8s" })} />
+                <rect className="pk hollow" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${OUT}")`, "--dur": "7s", "--d": "6.3s" })} />
+                <rect className="pk hollow" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: 'path("M90 146 V210")', "--dur": "8s", "--d": "4s" })} />
+                <rect className="pk hollow" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: 'path("M118 146 V190 H234 V210")', "--dur": "8s", "--d": "5.5s" })} />
             </svg>
         </div>
     )

@@ -88,15 +88,18 @@
     .topo:has(.site.s-daejeon:hover) .link.s-daejeon { stroke: var(--signal); stroke-width: 1.8; }
 }
 
+/* the same glass capsule the rest of the page uses (tokens in sections.css) */
 .topo .pkt {
-    fill: var(--signal);
+    fill: var(--pkt-face);
+    stroke: var(--signal);
+    stroke-width: var(--pkt-rim);
     opacity: 0;
     offset-rotate: auto;
-    filter: drop-shadow(0 0 3px var(--glow));
+    filter: drop-shadow(0 0 2.5px var(--glow));
     animation: pkt var(--dur, 7s) linear infinite;
     animation-delay: var(--delay, 0s);
 }
-.topo .pkt.hollow { fill: var(--card); stroke: var(--signal); stroke-width: 1.2; }
+.topo .pkt.hollow { fill: var(--pkt-void); }
 /* Travel takes the first 35% of a cycle (eased), then the packet rests hidden. */
 @keyframes pkt {
     0% { offset-distance: 0%; opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.3, 1); }

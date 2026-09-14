@@ -45,7 +45,7 @@ export function Experience() {
             <SectionHead title="Experience" />
             <div className="mt-8 md:mt-12">
                 {experience.map((exp) => (
-                    <div key={exp.id} className="grid gap-2 border-t border-foreground/10 py-6 md:grid-cols-[11rem_1fr] md:gap-10 md:py-8">
+                    <div key={exp.id} className="grid gap-2 border-t-[length:0.667px] border-foreground/10 py-6 md:grid-cols-[11rem_1fr] md:gap-10 md:py-8">
                         <span className="mono text-xs text-muted-foreground md:pt-2.5">{exp.period}</span>
                         <div>
                             <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">

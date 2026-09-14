@@ -36,7 +36,7 @@ export default function Home() {
       <div className="fixed inset-0 h-screen w-full z-0 max-lg:relative max-lg:inset-auto max-lg:h-auto">
         <Hero />
       </div>
-      <div id="resume" className="relative z-10 w-full mt-[100vh] max-lg:mt-0 scroll-mt-20 bg-background shadow-[0_-30px_80px_-40px_var(--lift)] max-lg:shadow-none">
+      <div id="resume" className="relative z-10 w-full mt-[100vh] max-lg:mt-0 scroll-mt-20 bg-background shadow-[0_-20px_53.333px_-26.667px_var(--lift)] max-lg:shadow-none">
         {/* the same ground of light the hero stands on, carried under the whole resume */}
         <div className="fixed inset-0 z-0 pointer-events-none"><LightField calm /></div>
         {scenes.map((s, i) => (

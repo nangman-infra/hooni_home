@@ -2,15 +2,37 @@
    cannot see used in that file, and it is only referenced from hero.css and this file. */
 :root { --signal: #0071e3; --alert: #d70015; --glow: color-mix(in oklab, var(--signal) 35%, transparent); --on-signal: #fff; --lift: rgb(0 0 0 / 0.14); }
 .dark { --signal: #f0b33e; --alert: #f87171; --glow: var(--signal); --on-signal: #1a1204; --lift: rgb(0 0 0 / 0.9); }
+/* Every packet on the page is the same object: a glass capsule carrying the signal. The face is a
+   dilute wash inside a lit hairline, the panes' material at packet size; an encapsulated packet
+   (one inside a tunnel) empties the face and keeps the rim. topology.css uses these too. */
+:root {
+    --pkt-face: color-mix(in oklab, var(--signal) 46%, transparent);
+    --pkt-void: color-mix(in oklab, var(--signal) 10%, transparent);
+    --pkt-lost: color-mix(in oklab, var(--alert) 46%, transparent);
+    --pkt-rim: 0.7;
+}
 
 /* ---------- page scale and content column ----------
-   Up to 1440px wide the root stays at the browser default; above that it grows with the screen,
-   up to 1.5x at 3200px, so type, spacing and the column scale together instead of leaving a small
-   page in the middle of a big monitor. The column is 60rem or 62vw, whichever is wider, capped at
-   84rem. From 1280px up its left edge also clears the spine label. */
-html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
+   The page is set to look the way it used to at 67% browser zoom. Zoom lays a page out in a window
+   1.5x wider and draws it at 2/3, so vw and svh sizes (the name, the map) come out the same and
+   rem and px sizes come out at 2/3 of a wider-screen root. Every length here follows from that:
+   the root below is 2/3 of the old ramp read at 1.5x the width (12.85px at 1440, 16px from 2134
+   up), px values are 2/3 of what they were, and breakpoints are 2/3 of the old ones (1024 -> 683,
+   1280 -> 854, 768 -> 512, set for Tailwind in globals.css). rem, vw, svh and clamp(rem, vw, rem)
+   need nothing else. The column is 60rem or 62vw, whichever is wider, capped at 84rem. From 854px
+   up its left edge also clears the spine label. */
+html { font-size: clamp(66.667%, 0.4545vw + 0.394rem, 100%); }
+/* Phones get a phone scale, not a shrunken desktop: below the hero's stacking width the root is
+   16px, the size the mobile layout was drawn and reviewed at. */
+@media (max-width: 682px) { html { font-size: 100%; } }
+/* Body text in Geist, the face next/font already loads (its variable lives on <body>, so the stack
+   has to be declared here, not inherited from Tailwind's default on <html>). The macOS system font
+   it replaces adds its own letter-spacing at small sizes, which no CSS can switch off, so small text
+   ran about 5% wider than the same page at 67% zoom. Geist scales in exact proportion; Hangul
+   falls through to the system Korean face as before. */
+body { font-family: var(--font-geist-sans), system-ui, sans-serif; }
 .wrap { --gutter: 7vw; width: min(100% - 2 * var(--gutter), clamp(60rem, 62vw, 84rem)); margin-inline: auto; }
-@media (min-width: 1280px) { .wrap { --gutter: max(7vw, 3vw + 9.5rem); } }
+@media (min-width: 854px) { .wrap { --gutter: max(7vw, 3vw + 9.5rem); } }
 
 /* ---------- typography ---------- */
 .display { font-family: var(--font-playfair), "Playfair Display", Georgia, serif; font-weight: 500; letter-spacing: -0.015em; }
@@ -29,10 +51,13 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
     overflow: clip; /* clip, not hidden: hidden makes a scroll container and kills view() below */
     padding: 6rem 0 5rem;
 }
+/* Desktop: one scene per screen. At the 67% scale 40rem is about 514px, so two scenes shared the
+   window and the hop label named whichever happened to cover the middle. Phones keep 40rem. */
+@media (min-width: 683px) { .scene { min-height: 100svh; } }
 .scene-grid {
     position: absolute; inset: 0; pointer-events: none; opacity: 0.55;
-    background-image: radial-gradient(circle, color-mix(in oklab, var(--foreground) 16%, transparent) 1px, transparent 1.4px);
-    background-size: 28px 28px;
+    background-image: radial-gradient(circle, color-mix(in oklab, var(--foreground) 16%, transparent) 0.667px, transparent 0.933px);
+    background-size: 18.667px 18.667px;
     mask-image: radial-gradient(ellipse 60% 55% at 50% 50%, #000 10%, transparent 70%);
 }
 .scene > * { position: relative; }
@@ -45,33 +70,33 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
 :root { --spine-x: 3vw; }
 .spine { position: fixed; inset: 0; z-index: 20; pointer-events: none; }
 .spine-line {
-    position: absolute; left: var(--spine-x); top: 0; bottom: 0; width: 1px;
-    background: repeating-linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 34%, transparent) 0 5px, transparent 5px 11px);
+    position: absolute; left: var(--spine-x); top: 0; bottom: 0; width: 0.667px;
+    background: repeating-linear-gradient(to bottom, color-mix(in oklab, var(--foreground) 34%, transparent) 0 3.333px, transparent 3.333px 7.333px);
 }
 /* how far down the run you are: the route fills in behind the packet as the page scrolls */
-.spine-fill { position: absolute; left: var(--spine-x); top: 0; height: 100%; width: 1px; transform-origin: top; transform: scaleY(0); background: linear-gradient(to bottom, color-mix(in oklab, var(--signal) 15%, transparent), var(--signal)); }
+.spine-fill { position: absolute; left: var(--spine-x); top: 0; height: 100%; width: 0.667px; transform-origin: top; transform: scaleY(0); background: linear-gradient(to bottom, color-mix(in oklab, var(--signal) 15%, transparent), var(--signal)); }
 @supports (animation-timeline: scroll()) {
     .spine-fill { animation: spine-progress linear both; animation-timeline: scroll(root); }
 }
 @keyframes spine-progress { to { transform: scaleY(1); } }
-.spine-pkt { position: absolute; left: var(--spine-x); top: 50%; width: 0.5625rem; height: 0.5625rem; translate: calc(0.5px - 50%) -50%; border-radius: 50%; background: var(--signal); box-shadow: 0 0 12px var(--glow); }
-.spine-pkt::after { content: ""; position: absolute; inset: -1px; border-radius: 50%; border: 1px solid var(--signal); opacity: 0; }
+.spine-pkt { position: absolute; left: var(--spine-x); top: 50%; width: 0.36rem; height: 0.72rem; translate: calc(0.333px - 50%) -50%; border: 0.667px solid var(--signal); border-radius: 999px; background: var(--pkt-face); box-shadow: 0 0 6.667px var(--glow); }
+.spine-pkt::after { content: ""; position: absolute; inset: -0.667px; border-radius: 999px; border: 0.667px solid var(--signal); opacity: 0; }
 /* the packet announces each hop as it reaches it: one ring, not a heartbeat */
-.spine-ring { position: absolute; left: var(--spine-x); top: 50%; width: 0.5625rem; height: 0.5625rem; translate: calc(0.5px - 50%) -50%; border-radius: 50%; border: 1px solid var(--signal); animation: spine-ring 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 2 both; }
+.spine-ring { position: absolute; left: var(--spine-x); top: 50%; width: 0.5625rem; height: 0.5625rem; translate: calc(0.333px - 50%) -50%; border-radius: 50%; border: 0.667px solid var(--signal); animation: spine-ring 1.1s cubic-bezier(0.2, 0.7, 0.2, 1) 2 both; }
 @keyframes spine-ring { from { transform: scale(1); opacity: 0.75; } to { transform: scale(3.4); opacity: 0; } }
-.spine-label { position: absolute; left: calc(var(--spine-x) + 1rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 2px; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 0.6875rem; line-height: 1.3; letter-spacing: 0.04em; color: var(--muted-foreground); }
+.spine-label { position: absolute; left: calc(var(--spine-x) + 1rem); top: 50%; transform: translateY(-50%); display: flex; flex-direction: column; gap: 1.333px; font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 0.6875rem; line-height: 1.3; letter-spacing: 0.04em; color: var(--muted-foreground); }
 .spine-label span:last-child { color: var(--foreground); }
 @supports (animation-timeline: scroll()) {
     .spine { animation: spine-in linear both; animation-timeline: scroll(root); animation-range: 30vh 100vh; }
     .spine-line { animation: spine-flow linear both; animation-timeline: scroll(root); }
 }
 @keyframes spine-in { from { opacity: 0; } to { opacity: 1; } }
-@keyframes spine-flow { to { background-position: 0 -2400px; } }
-.hop { position: absolute; left: var(--spine-x); top: 50%; width: 0.5625rem; height: 0.5625rem; translate: calc(0.5px - 50%) -50%; border-radius: 50%; background: var(--background); border: 1px solid color-mix(in oklab, var(--foreground) 45%, transparent); transition: background 0.35s, border-color 0.35s, box-shadow 0.35s; }
-.scene[data-here] .hop { background: var(--signal); border-color: var(--signal); box-shadow: 0 0 14px var(--glow); }
+@keyframes spine-flow { to { background-position: 0 -1600px; } }
+.hop { position: absolute; left: var(--spine-x); top: 50%; width: 0.5625rem; height: 0.5625rem; translate: calc(0.333px - 50%) -50%; border-radius: 50%; background: var(--background); border: 0.667px solid color-mix(in oklab, var(--foreground) 45%, transparent); transition: background 0.35s, border-color 0.35s, box-shadow 0.35s; }
+.scene[data-here] .hop { background: var(--signal); border-color: var(--signal); box-shadow: 0 0 9.333px var(--glow); }
 
 /* ---------- project screenshots ---------- */
-.shot { overflow: hidden; border: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent); border-radius: 8px; background: color-mix(in oklab, var(--foreground) 3%, transparent); }
+.shot { overflow: hidden; border: 0.667px solid color-mix(in oklab, var(--foreground) 22%, transparent); border-radius: 5.333px; background: color-mix(in oklab, var(--foreground) 3%, transparent); }
 .shot img { display: block; width: 100%; height: auto; }
 
 
@@ -79,7 +104,7 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
 .icon-btn {
     display: inline-flex; align-items: center; justify-content: center;
     min-width: 3rem; height: 3rem; padding: 0 0.8125rem;
-    border: 1px solid color-mix(in oklab, var(--foreground) 32%, transparent);
+    border: 0.667px solid color-mix(in oklab, var(--foreground) 32%, transparent);
     border-radius: 0.5rem;
     color: var(--foreground);
     transition: border-color 0.25s, background-color 0.25s, transform 0.25s;
@@ -87,9 +112,9 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
 .icon-btn svg { height: 1.25rem; width: auto; }
 .icon-btn.lg { min-width: 3.625rem; height: 3.625rem; padding: 0 1rem; }
 .icon-btn.lg svg { height: 1.5625rem; }
-.icon-btn:hover, .icon-btn:focus-visible { border-color: var(--signal); background: color-mix(in oklab, var(--signal) 14%, transparent); transform: translateY(-1px); outline: none; }
+.icon-btn:hover, .icon-btn:focus-visible { border-color: var(--signal); background: color-mix(in oklab, var(--signal) 14%, transparent); transform: translateY(-0.667px); outline: none; }
 
-@keyframes rv-in { from { opacity: 0; transform: translateY(28px); } to { opacity: 1; transform: none; } }
+@keyframes rv-in { from { opacity: 0; transform: translateY(18.667px); } to { opacity: 1; transform: none; } }
 
 /* ---------- the run itself ----------
    Each scene is carried by the scroll rather than triggered by it: its column rises into place as
@@ -123,6 +148,7 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
 .viz text.name { font-size: 11.5px; font-weight: 600; letter-spacing: -0.01em; fill: var(--foreground); }
 .viz text.addr { font-family: var(--font-geist-mono), ui-monospace, monospace; font-size: 9px; fill: var(--muted-foreground); }
 .viz text.tag { font-size: 9px; font-weight: 500; fill: var(--muted-foreground); }
+.viz .ico { color: var(--muted-foreground); }
 .viz text.tag.addr { font-size: 8.5px; font-weight: 400; }
 .viz text.note { font-size: 10px; fill: var(--muted-foreground); }
 .viz text.sigtext { fill: var(--signal); }
@@ -151,8 +177,8 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
 .viz .draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
 .viz .fade { opacity: 0; }
 .viz .fill { fill-opacity: 0; }
-.viz .pk { fill: var(--signal); filter: drop-shadow(0 0 4px var(--glow)); offset-rotate: 0deg; opacity: 0; }
-.viz .pk.hollow { fill: none; stroke: var(--signal); stroke-width: 1.4; }
+.viz .pk { fill: var(--pkt-face); stroke: var(--signal); stroke-width: var(--pkt-rim); filter: drop-shadow(0 0 2.5px var(--glow)); offset-rotate: auto; opacity: 0; }
+.viz .pk.hollow { fill: var(--pkt-void); }
 .scene[data-in] .viz .draw { animation: vz-draw 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0s); }
 .scene[data-in] .viz .fade { animation: vz-fade 0.7s ease both; animation-delay: var(--d, 0s); }
 .scene[data-in] .viz .draw.fill { animation: vz-draw 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both, vz-fill 0.7s ease both; animation-delay: var(--d, 0s), calc(var(--d, 0s) + 0.6s); }
@@ -183,19 +209,19 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
 .big-year em { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-style: normal; font-weight: 400; font-size: 0.62em; }
 .big-year em { font-style: normal; font-weight: 400; }
 .tl { position: relative; padding-left: 2.4rem; }
-.tl::before { content: ""; position: absolute; left: 6px; top: 0; bottom: 0; width: 1px; background: color-mix(in oklab, var(--foreground) 14%, transparent); }
-.tl-line { position: absolute; left: 6px; top: 0; bottom: 0; width: 1px; background: var(--signal); transform-origin: top; transform: scaleY(0); box-shadow: 0 0 14px -2px var(--glow); }
-.tl-item { position: relative; padding: 0.55rem 0; opacity: 0; transform: translateY(14px); }
-.tl-dot { position: absolute; left: calc(-2.4rem + 3px); top: 1rem; width: 7px; height: 7px; border-radius: 50%; background: var(--background); border: 1px solid color-mix(in oklab, var(--foreground) 45%, transparent); }
+.tl::before { content: ""; position: absolute; left: 4px; top: 0; bottom: 0; width: 0.667px; background: color-mix(in oklab, var(--foreground) 14%, transparent); }
+.tl-line { position: absolute; left: 4px; top: 0; bottom: 0; width: 0.667px; background: var(--signal); transform-origin: top; transform: scaleY(0); box-shadow: 0 0 9.333px -1.333px var(--glow); }
+.tl-item { position: relative; padding: 0.55rem 0; opacity: 0; transform: translateY(9.333px); }
+.tl-dot { position: absolute; left: calc(-2.4rem + 2px); top: 1rem; width: 4.667px; height: 4.667px; border-radius: 50%; background: var(--background); border: 0.667px solid color-mix(in oklab, var(--foreground) 45%, transparent); }
 .scene[data-in] .tl-line { animation: tl-draw 2.6s linear both; animation-delay: 0.3s; }
 .scene[data-in] .tl-item { animation: rv-in 0.6s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: calc(0.35s + var(--i) * 0.3s); }
 .scene[data-in] .tl-dot { animation: tl-dot 0.4s ease both; animation-delay: calc(0.45s + var(--i) * 0.3s); }
 @keyframes tl-draw { from { transform: scaleY(0); } to { transform: scaleY(1); } }
-@keyframes tl-dot { to { background: var(--signal); border-color: var(--signal); box-shadow: 0 0 10px -1px var(--glow); } }
+@keyframes tl-dot { to { background: var(--signal); border-color: var(--signal); box-shadow: 0 0 6.667px -0.667px var(--glow); } }
 
 /* ---------- columns / chips ---------- */
-.col { border-top: 1px solid color-mix(in oklab, var(--foreground) 22%, transparent); padding-top: 1.4rem; }
-.chip { border: 1px solid color-mix(in oklab, var(--foreground) 18%, transparent); border-radius: 4px; padding: 0.3rem 0.65rem; font-size: 0.8125rem; color: var(--muted-foreground); }
+.col { border-top: 0.667px solid color-mix(in oklab, var(--foreground) 22%, transparent); padding-top: 1.4rem; }
+.chip { border: 0.667px solid color-mix(in oklab, var(--foreground) 18%, transparent); border-radius: 2.667px; padding: 0.3rem 0.65rem; font-size: 0.8125rem; color: var(--muted-foreground); }
 
 /* ---------- Project 3: one clock per lane. --t counts seconds 0..12 and loops; each frame, ack
    and player cell is a function of --t and its own --leave / --on, so the lanes stay in step. ---------- */
@@ -203,22 +229,22 @@ html { font-size: clamp(100%, 0.4545vw + 0.591rem, 150%); }
 .stream .lane { --t: 0; }
 .scene[data-in] .stream .lane { animation: clock 12s linear infinite; }
 @keyframes clock { to { --t: 12; } }
-.stream .fr { fill: var(--signal); offset-rotate: 0deg; offset-distance: calc(clamp(0, (var(--t) - var(--leave)) / 3, 1) * 100%); opacity: clamp(0, min(var(--t) - var(--leave), var(--leave) + 3.15 - var(--t)) * 20, 1); }
-.stream .fr.ack { fill: none; stroke: var(--signal); stroke-width: 1.2; }
-.stream .fr.lost { fill: var(--alert); offset-distance: calc(clamp(0, (var(--t) - var(--leave)) / 3, 0.5) * 100%); opacity: clamp(0, min(var(--t) - var(--leave), var(--leave) + 1.7 - var(--t)) * 4, 1); }
+.stream .fr { fill: var(--pkt-face); stroke: var(--signal); stroke-width: var(--pkt-rim); filter: drop-shadow(0 0 2.5px var(--glow)); offset-rotate: auto; offset-distance: calc(clamp(0, (var(--t) - var(--leave)) / 3, 1) * 100%); opacity: clamp(0, min(var(--t) - var(--leave), var(--leave) + 3.15 - var(--t)) * 20, 1); }
+.stream .fr.ack { fill: var(--pkt-void); }
+.stream .fr.lost { fill: var(--pkt-lost); stroke: var(--alert); offset-distance: calc(clamp(0, (var(--t) - var(--leave)) / 3, 0.5) * 100%); opacity: clamp(0, min(var(--t) - var(--leave), var(--leave) + 1.7 - var(--t)) * 4, 1); }
 .stream .cell { fill: var(--signal); opacity: calc(0.16 + 0.84 * clamp(0, (var(--t) - var(--on, 99)) * 20, 1)); }
 .stream .cell.skip { fill: none; stroke: var(--alert); stroke-dasharray: 2 2; opacity: 1; }
 
 /* ---------- Education: how far the degree has run (--p from the dates) ---------- */
-.bar { position: relative; height: 1px; background: color-mix(in oklab, var(--foreground) 22%, transparent); }
-.bar-fill { position: absolute; left: 0; top: -1px; height: 3px; width: var(--p); border-radius: 2px; background: var(--signal); box-shadow: 0 0 10px -1px var(--glow); transform-origin: left; transform: scaleX(0); }
+.bar { position: relative; height: 0.667px; background: color-mix(in oklab, var(--foreground) 22%, transparent); }
+.bar-fill { position: absolute; left: 0; top: -0.667px; height: 2px; width: var(--p); border-radius: 1.333px; background: var(--signal); box-shadow: 0 0 6.667px -0.667px var(--glow); transform-origin: left; transform: scaleX(0); }
 .scene[data-in] .bar-fill { animation: bar-fill 1.6s cubic-bezier(0.2, 0.7, 0.2, 1) 0.4s both; }
 @keyframes bar-fill { to { transform: none; } }
 
-/* The hop label needs a margin to sit in; below 1280px the column takes that room. */
-@media (max-width: 1279px) { .spine-label { display: none; } }
+/* The hop label needs a margin to sit in; below 854px the column takes that room. */
+@media (max-width: 853px) { .spine-label { display: none; } }
 
-@media (max-width: 767px) {
+@media (max-width: 511px) {
     .scene { padding: 5.5rem 0 3.5rem; }
 }
 @media (prefers-reduced-motion: reduce) {

@@ -44,12 +44,12 @@ function Lane({ y, tcp }: Readonly<{ y: number; tcp: boolean }>) {
                 <rect key={i} className={`cell ${on === null ? "skip" : ""}`} x={390 + i * 13.5} y={y + 31} width="11.5" height="10" rx="1" style={on === null ? undefined : v({ "--on": `${on}` })} />
             ))}
             {LEAVE.map((leave, i) => (
-                <rect key={i} className={`fr ${i === 2 ? "lost" : ""}`} x="-3.5" y="-3.5" width="7" height="7" rx="1" style={v({ offsetPath: `path("${path}")`, "--leave": `${leave}` })} />
+                <rect key={i} className={`fr ${i === 2 ? "lost" : ""}`} x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${path}")`, "--leave": `${leave}` })} />
             ))}
             {tcp && (
                 <>
-                    <circle className="fr ack" r="3.2" style={v({ offsetPath: `path("M390 ${y} H90")`, "--leave": `${ACK}` })} />
-                    <rect className="fr" x="-3.5" y="-3.5" width="7" height="7" rx="1" style={v({ offsetPath: `path("${path}")`, "--leave": `${RESEND}` })} />
+                    <rect className="fr ack" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("M390 ${y} H90")`, "--leave": `${ACK}` })} />
+                    <rect className="fr" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${path}")`, "--leave": `${RESEND}` })} />
                 </>
             )}
         </g>

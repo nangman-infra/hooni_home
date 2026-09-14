@@ -1,4 +1,5 @@
 import type { CSSProperties } from "react"
+import { Users } from "lucide-react"
 import { GlassRim } from "@/components/glass-rim"
 
 const v = (o: Record<string, string>) => o as CSSProperties
@@ -25,7 +26,7 @@ const BOXES: Box[] = [
 ]
 const BOTTOM = (b: Box) => b.y + boxH(b.lines.length)
 
-const IN_USERS = `M-6 150 H${C0}`
+const IN_USERS = `M-4 150 H${C0}`
 const TOP_IPSEC = `M${R0} 38 H${C1}`
 const UP_IPSEC = `M${M0} 110 V${BOTTOM(BOXES[0])}`
 const AWS_VPN = [`M378 ${BOTTOM(BOXES[1])} V110`, `M390 ${BOTTOM(BOXES[1])} V110`]
@@ -51,9 +52,11 @@ export function HybridScene() {
                 {LINKS.map((l) => (
                     <path key={l.d} className={`wire ${l.wg ? "wg fade" : "draw"}`} d={l.d} pathLength={1} style={v({ "--d": `${l.delay}s` })} />
                 ))}
-                <circle className="glow fade" cx="-14" cy="150" r="8" style={v({ "--d": "0.8s" })} />
-                <circle className="box draw fill" cx="-14" cy="150" r="8" pathLength={1} style={v({ "--d": "0.8s" })} />
-                <text className="tag fade" x="-14" y="172" textAnchor="middle" style={v({ "--d": "1.3s" })}>users</text>
+                {/* the same node the hero map draws: a ring of r=10 holding a 12-unit people icon */}
+                <circle className="glow fade" cx="-14" cy="150" r="10" style={v({ "--d": "0.8s" })} />
+                <circle className="box draw fill" cx="-14" cy="150" r="10" pathLength={1} style={v({ "--d": "0.8s" })} />
+                <Users className="ico fade" x={-20} y={144} width={12} height={12} strokeWidth={2} style={v({ "--d": "1.1s" })} aria-hidden="true" />
+                <text className="tag fade" x="-14" y="174" textAnchor="middle" style={v({ "--d": "1.3s" })}>users</text>
                 {BOXES.map((b) => (
                     <g key={b.name}>
                         <rect className="glow fade" x={b.x} y={b.y} width={W} height={boxH(b.lines.length)} rx="5" style={v({ "--d": `${b.d}s` })} />
@@ -76,12 +79,12 @@ export function HybridScene() {
                 <text className="note fade" x="40" y="322" style={v({ "--d": "2.2s" })}>192.168.10.x exists on both Seokchon and Daejeon,</text>
                 <text className="note fade" x="40" y="336" style={v({ "--d": "2.2s" })}>so Daejeon is reached by its overlay address.</text>
 
-                <circle className="pk" r="3.2" style={v({ offsetPath: `path("${IN_USERS}")`, "--dur": "6s", "--d": "2.4s" })} />
-                <circle className="pk" r="3.2" style={v({ offsetPath: `path("${TO_AWS[0]}")`, "--dur": "6s", "--d": "3.2s" })} />
-                <circle className="pk hollow" r="3.2" style={v({ offsetPath: `path("${OVERLAY}")`, "--dur": "6s", "--d": "3.8s" })} />
-                <circle className="pk hollow" r="3.2" style={v({ offsetPath: `path("${UP_IPSEC}")`, "--dur": "7s", "--d": "4.4s" })} />
-                <circle className="pk hollow" r="3.2" style={v({ offsetPath: `path("${TOP_IPSEC}")`, "--dur": "7s", "--d": "5s" })} />
-                <circle className="pk hollow" r="3.2" style={v({ offsetPath: `path("${AWS_VPN[0]}")`, "--dur": "7s", "--d": "5.6s" })} />
+                <rect className="pk" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${IN_USERS}")`, "--dur": "6s", "--d": "2.4s" })} />
+                <rect className="pk" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${TO_AWS[0]}")`, "--dur": "6s", "--d": "3.2s" })} />
+                <rect className="pk hollow" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${OVERLAY}")`, "--dur": "6s", "--d": "3.8s" })} />
+                <rect className="pk hollow" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${UP_IPSEC}")`, "--dur": "7s", "--d": "4.4s" })} />
+                <rect className="pk hollow" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${TOP_IPSEC}")`, "--dur": "7s", "--d": "5s" })} />
+                <rect className="pk hollow" x="-4" y="-1.6" width="8" height="3.2" rx="1.6" style={v({ offsetPath: `path("${AWS_VPN[0]}")`, "--dur": "7s", "--d": "5.6s" })} />
             </svg>
         </div>
     )

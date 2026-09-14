@@ -120,8 +120,8 @@ export function ProjectScene({ index }: Readonly<{ index: number }>) {
     return (
         <Container>
             {index === 0 && <SectionHead title="Projects" />}
-            <div className={`grid gap-8 min-[1100px]:grid-cols-12 min-[1100px]:gap-12 min-[1100px]:items-center ${index === 0 ? "mt-8 md:mt-10" : ""}`}>
-                <div className="min-[1100px]:col-span-5">
+            <div className={`grid gap-8 min-[734px]:grid-cols-12 min-[734px]:gap-12 min-[734px]:items-center ${index === 0 ? "mt-8 md:mt-10" : ""}`}>
+                <div className="min-[734px]:col-span-5">
                     <span className="label block mb-5">Project {index + 1} of {projects.length}</span>
                     <h3 className={`${hasHangul(p.title) ? "title-ko text-3xl md:text-[2.4rem]" : "display text-4xl md:text-[3rem]"} leading-[1.1] text-foreground`}>
                         {p.title}
@@ -151,7 +151,7 @@ export function ProjectScene({ index }: Readonly<{ index: number }>) {
                         ))}
                     </div>
                 </div>
-                <div className="min-[1100px]:col-span-7 -order-1 min-[1100px]:order-none max-md:-mx-[7vw]">
+                <div className="min-[734px]:col-span-7 -order-1 min-[734px]:order-none max-md:-mx-[7vw]">
                     <Visual p={p} />
                 </div>
             </div>

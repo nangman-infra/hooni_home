@@ -17,11 +17,8 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_SHA: process.env.GIT_SHA || gitSha(),
     NEXT_PUBLIC_BUILD_TIME: process.env.BUILD_TIME || new Date().toISOString(),
   },
-  devIndicators: {
-    // @ts-expect-error - Next.js 15 option
-    appIsrStatus: false,
-    buildActivity: false,
-  },
+  // no dev overlay badge in the corner (Next 16 takes false; appIsrStatus/buildActivity were removed)
+  devIndicators: false,
 };
 
 export default nextConfig;

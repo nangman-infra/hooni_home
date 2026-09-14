@@ -24,7 +24,7 @@ export function Certifications() {
             <SectionHead title="Certifications" />
             <ul className="mt-8 md:mt-12">
                 {certs.map((cert) => (
-                    <li key={cert.id} className="grid gap-1 border-t border-foreground/10 py-6 md:grid-cols-[1fr_auto] md:items-baseline md:gap-8 md:py-8">
+                    <li key={cert.id} className="grid gap-1 border-t-[length:0.667px] border-foreground/10 py-6 md:grid-cols-[1fr_auto] md:items-baseline md:gap-8 md:py-8">
                         <h3 className="text-2xl md:text-4xl font-bold tracking-tight text-foreground">{cert.name}</h3>
                         <p className="text-sm md:text-base text-muted-foreground">{cert.issuer}</p>
                     </li>
