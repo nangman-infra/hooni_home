@@ -1,0 +1,94 @@
+/* Posters in characters. Every class is as- prefixed; Tailwind owns the bare names.
+
+   Monochrome on the dark ground the user kept. One high-contrast serif set large and tight for the
+   one line each section says; one small sans for everything else; one mono for dates, addresses
+   and stacks. Faint vertical rules run the whole page, the way the reference's board does. */
+
+body {
+    --ui: var(--font-geist-sans), system-ui, sans-serif;
+    --se: var(--font-instrument), "Instrument Serif", Georgia, serif;
+    --kr: "Apple SD Gothic Neo", var(--font-kr), system-ui, sans-serif;
+    --krs: var(--font-notoserifkr), "Apple SD Gothic Neo", serif;
+    --mo: var(--font-geist-mono), ui-monospace, monospace;
+    --ground: #0b0b0c;
+    --ink: #ececee;
+    --dim: #8f8f95;
+    --faint: #55555b;
+    --rule: rgb(236 236 238 / 0.09);
+    --pad: clamp(1.25rem, 5vw, 5rem);
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--ui);
+    font-weight: 400;
+    overflow-x: clip;
+}
+.as-site { position: relative; }
+::selection { background: var(--ink); color: var(--ground); }
+main { position: relative; z-index: 2; }
+.as-guides { position: fixed; inset: 0; z-index: 0; pointer-events: none; background: repeating-linear-gradient(90deg, rgb(236 236 238 / 0.04) 0 1px, transparent 1px calc(100% / 12)); background-position: calc(100% / 24) 0; }
+
+.as-top { position: fixed; z-index: 30; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 1.2rem var(--pad) 0; font-size: 0.7rem; letter-spacing: 0.02em; color: var(--faint); pointer-events: none; transition: opacity 0.5s; }
+:root[data-hop="0"] .as-top { opacity: 0; }
+
+/* ---------- a poster ---------- */
+.as-hop { position: relative; view-timeline-name: --stop; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; padding: 6rem var(--pad) 5rem; text-align: center; }
+.as-in { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: clamp(1.1rem, 2.4vh, 1.8rem); width: 100%; max-width: 64rem; }
+.as-pill { display: inline-block; padding: 0.42rem 1.05rem; border: 1px solid rgb(236 236 238 / 0.2); border-radius: 999px; font-size: 0.74rem; letter-spacing: 0.02em; color: var(--dim); }
+.as-h { margin: 0; font-family: var(--se); font-weight: 400; font-size: clamp(3.2rem, 8.6vw, 8rem); line-height: 0.9; letter-spacing: -0.035em; text-wrap: balance; max-width: 13ch; }
+.as-h--ko { font-family: var(--krs); font-weight: 600; font-size: clamp(2.2rem, 6vw, 5.4rem); line-height: 1.08; letter-spacing: -0.03em; word-break: keep-all; max-width: 18ch; }
+.as-sub { display: block; margin-top: 0.9rem; font-family: var(--mo); font-weight: 400; font-size: 0.68rem; letter-spacing: 0.44em; color: var(--dim); padding-left: 0.44em; }
+.as-figwrap { width: 100%; max-width: 58rem; display: grid; justify-items: center; overflow: hidden; }
+.as-fig { display: block; max-width: 100%; height: auto; font-family: var(--mo); }
+
+/* the captions: two columns like the reference's foot, read from the left */
+.as-foot { width: 100%; max-width: 58rem; display: grid; gap: 1.2rem 3rem; text-align: left; font-size: 0.86rem; line-height: 1.6; color: var(--dim); }
+.as-foot--2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.as-foot--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.as-foot--1 { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 899px) { .as-foot--2, .as-foot--3 { grid-template-columns: minmax(0, 1fr); } }
+.as-foot p { margin: 0; }
+.as-span { grid-column: 1 / -1; }
+.as-right { justify-self: end; text-align: right; }
+.as-center { justify-self: center; text-align: center; display: grid; justify-items: center; gap: 0.9rem; }
+.as-between { display: flex; justify-content: space-between; }
+.as-ko { font-family: var(--kr); word-break: keep-all; }
+.as-lead { color: var(--ink); font-size: 0.95rem; }
+.as-strong { color: var(--ink); font-weight: 500; }
+.as-mono { font-family: var(--mo); font-size: 0.7rem; letter-spacing: 0.06em; color: var(--dim); }
+.as-cap { font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.16em; color: var(--faint); }
+.as-link { margin-left: 1.2rem; color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--faint); padding-bottom: 0.1rem; text-transform: uppercase; }
+.as-link:hover, .as-link:focus-visible { border-color: var(--ink); }
+.as-list, .as-plain { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.45rem; }
+.as-list li { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 0.8rem; align-items: baseline; padding-top: 0.45rem; border-top: 1px solid var(--rule); }
+.as-plain li { position: relative; padding-left: 0.95rem; }
+.as-plain li::before { content: ""; position: absolute; left: 0; top: 0.7em; width: 0.35rem; height: 1px; background: var(--faint); }
+.as-exp { display: grid; grid-template-columns: 8rem minmax(0, 1fr); gap: 0.8rem 1.2rem; padding: 1rem 0; border-top: 1px solid var(--rule); }
+.as-exp h3 { margin: 0 0 0.5rem; font-size: 1rem; font-weight: 500; color: var(--ink); }
+.as-exp h3 em { margin-left: 0.4rem; font-style: normal; font-size: 0.7rem; color: var(--faint); }
+.as-exp h3 .as-mono { margin-left: 0.7rem; }
+@media (max-width: 899px) { .as-exp, .as-list li { grid-template-columns: minmax(0, 1fr); } }
+.as-bar { display: grid; gap: 0.6rem; align-content: end; }
+.as-bar i { display: block; position: relative; height: 1px; background: var(--rule); }
+.as-bar i::after { content: ""; position: absolute; inset: 0 auto 0 0; width: var(--p); background: var(--ink); }
+.as-shot { border: 1px solid rgb(236 236 238 / 0.12); }
+.as-shot img { display: block; width: 100%; height: auto; filter: grayscale(1) contrast(1.05); }
+
+.as-ways { display: flex; align-items: center; gap: 0.6rem; }
+.as-way { display: inline-flex; align-items: center; justify-content: center; width: 2.4rem; height: 2.4rem; border: 1px solid rgb(236 236 238 / 0.2); border-radius: 999px; color: var(--dim); transition: color 0.25s, border-color 0.25s; }
+.as-way svg { width: 1rem; height: 1rem; }
+.as-way:hover, .as-way:focus-visible { color: var(--ink); border-color: rgb(236 236 238 / 0.55); outline: none; }
+.as-ways--big { gap: 0.9rem; }
+.as-ways--big .as-way { width: 3.4rem; height: 3.4rem; color: var(--ink); }
+.as-ways--big .as-way svg { width: 1.4rem; height: 1.4rem; }
+
+/* ---------- the open ---------- */
+.as-open .as-h--ko { font-size: clamp(3rem, 8vw, 7.2rem); }
+
+/* ---------- arriving: fast in, slow stop, a beat apart ---------- */
+@supports (animation-timeline: view()) {
+    .as-l { animation: as-in linear both; animation-timeline: --stop; animation-range: cover calc(10% + var(--i, 0) * 3%) cover calc(26% + var(--i, 0) * 3%); }
+    @keyframes as-in { from { opacity: 0; transform: translate3d(0, 0.7rem, 0); } }
+    .as-open .as-l { animation-timeline: auto; animation-range: normal; }
+}
+.as-open .as-l { animation: as-in 1.2s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(0.2s + var(--i, 0) * 0.18s); }
+@media (prefers-reduced-motion: reduce) { .as-l { animation: none !important; opacity: 1 !important; transform: none !important; } }

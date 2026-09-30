@@ -1,0 +1,198 @@
+/* The organism. Every class is pa- prefixed; Tailwind owns the bare names.
+
+   Monochrome. One light sans, set small with room around it. Everything stands on the centre
+   line — headings, lists, marks — and the tree stands behind the whole width. Nothing is cleared
+   behind the type; each line keeps itself legible with a shadow in the ground colour. */
+
+body {
+    --ui: var(--font-geist-sans), system-ui, sans-serif;
+    --kr: "Apple SD Gothic Neo", var(--font-kr), system-ui, sans-serif;
+    --mo: var(--font-geist-mono), ui-monospace, monospace;
+    --ground: #0b0b0c;
+    --ink: #ececee;
+    --dim: #8d8d94;
+    --faint: #5a5a61;
+    --pad: clamp(1.25rem, 5vw, 5rem);
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--ui);
+    font-weight: 300;
+    overflow-x: clip;
+}
+.pa-site { position: relative; }
+::selection { background: var(--ink); color: var(--ground); }
+html:has(.pa-site) { background: #0b0b0c; }
+.pa-tree { position: fixed; inset: 0; z-index: 0; display: block; }
+main { position: relative; z-index: 2; }
+
+.pa-top { position: fixed; z-index: 30; inset: 0 0 auto; display: flex; justify-content: space-between; padding: 1.2rem var(--pad) 0; font-size: 0.66rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--faint); pointer-events: none; transition: opacity 0.5s; }
+:root[data-hop="0"] .pa-top { opacity: 0; }
+
+/* ---------- a stop: one column, on the centre line ---------- */
+.pa-hop { position: relative; view-timeline-name: --stop; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; justify-items: center; padding: 6rem var(--pad) 5rem; text-align: center; }
+.pa-in { display: grid; grid-template-columns: minmax(0, 1fr); justify-items: center; gap: 1.1rem; width: 100%; max-width: 44rem; }
+.pa-tag { display: flex; align-items: center; gap: 0.7rem; font-family: var(--mo); font-size: 0.62rem; letter-spacing: 0.24em; text-transform: uppercase; color: var(--faint); margin-bottom: 0.6rem; }
+.pa-tag i { width: 2rem; height: 1px; background: var(--faint); }
+.pa-l > p, .pa-l > h2, .pa-l > h3 { margin: 0; }
+
+/* ---------- type ---------- */
+.pa-head { font-weight: 300; font-size: clamp(1.7rem, 2.8vw, 2.5rem); line-height: 1.12; letter-spacing: -0.02em; text-wrap: balance; }
+.pa-head--ko { font-family: var(--kr); font-weight: 400; font-size: clamp(1.3rem, 2.1vw, 1.8rem); line-height: 1.32; word-break: keep-all; }
+.pa-head--tight { font-size: clamp(1.5rem, 2.4vw, 2.1rem); }
+.pa-say { font-family: var(--kr); font-weight: 300; font-size: clamp(1.1rem, 2vw, 1.6rem); line-height: 1.6; letter-spacing: -0.02em; word-break: keep-all; margin-inline: auto; }
+.pa-phase { display: flex; justify-content: center; align-items: center; gap: 0.9rem; font-family: var(--mo); font-size: 0.66rem; letter-spacing: 0.26em; text-transform: uppercase; color: var(--dim); }
+.pa-phase span { display: inline-flex; align-items: center; gap: 0.9rem; }
+.pa-phase i { width: 1.2rem; height: 1px; background: var(--faint); }
+
+/* history: a list read from the left, standing as one block on the centre line */
+.pa-hist { list-style: none; margin: 0.4rem 0 0; padding: 0; width: min(100%, 34rem); display: grid; text-align: left; }
+.pa-hist li { display: grid; grid-template-columns: 8.4rem minmax(0, 1fr); gap: 1rem; align-items: baseline; padding: 0.5rem 0; border-top: 1px solid rgb(236 236 238 / 0.08); font-family: var(--kr); font-size: 0.86rem; line-height: 1.5; word-break: keep-all; }
+@media (max-width: 899px) { .pa-hist li { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; } }
+
+.pa-when { font-family: var(--mo); font-size: 0.66rem; letter-spacing: 0.06em; color: var(--faint); }
+.pa-when--split { display: flex; justify-content: space-between; width: 100%; }
+.pa-cols { display: grid; gap: 1.2rem 2.5rem; grid-template-columns: repeat(auto-fit, minmax(min(9rem, 100%), 1fr)); width: 100%; max-width: 36rem; }
+.pa-col h3 { margin: 0 0 0.6rem; font-family: var(--mo); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--faint); }
+.pa-col ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.32rem; }
+.pa-col li { font-size: 0.88rem; font-weight: 400; }
+.pa-kicker { font-family: var(--mo); font-size: 0.62rem; letter-spacing: 0.22em; text-transform: uppercase; color: var(--dim); }
+.pa-sum { font-family: var(--kr); font-size: 0.86rem; line-height: 1.7; color: rgb(236 236 238 / 0.8); word-break: keep-all; max-width: 36rem; margin-inline: auto; }
+/* the reasoning reads as a list, so it is set flush left inside a centred block */
+.pa-dec { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.4rem; width: min(100%, 34rem); text-align: left; }
+.pa-dec li { position: relative; padding-left: 0.95rem; font-family: var(--kr); font-size: 0.78rem; line-height: 1.6; color: var(--dim); word-break: keep-all; }
+.pa-dec li::before { content: ""; position: absolute; left: 0; top: 0.65em; width: 0.35rem; height: 1px; background: var(--faint); }
+.pa-stack { font-family: var(--mo); font-size: 0.62rem; letter-spacing: 0.1em; color: var(--faint); }
+.pa-links { display: flex; justify-content: center; gap: 0.6rem; margin-top: 0.3rem; }
+
+
+/* the picture: flat on the page */
+.pa-shot { width: min(100%, 40rem); border: 1px solid rgb(236 236 238 / 0.1); overflow: hidden; }
+.pa-shot img { display: block; width: 100%; height: auto; filter: grayscale(1) contrast(1.05); transition: filter 0.6s; }
+.pa-shot:hover img { filter: none; }
+
+.pa-exp { display: grid; width: 100%; max-width: 36rem; }
+.pa-exp article { display: grid; justify-items: center; gap: 0.3rem; padding: 1.1rem 0; border-top: 1px solid rgb(236 236 238 / 0.08); }
+.pa-exp h3 { margin: 0; font-size: 1rem; font-weight: 500; }
+.pa-exp h3 em { margin-left: 0.4rem; font-style: normal; font-size: 0.66rem; color: var(--faint); }
+.pa-role-s { margin: 0 0 0.4rem; font-family: var(--mo); font-size: 0.62rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--dim); }
+.pa-exp ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.3rem; width: min(100%, 32rem); text-align: left; }
+.pa-exp li { position: relative; padding-left: 0.95rem; font-family: var(--kr); font-size: 0.78rem; line-height: 1.58; color: var(--dim); word-break: keep-all; }
+.pa-exp li::before { content: ""; position: absolute; left: 0; top: 0.65em; width: 0.35rem; height: 1px; background: var(--faint); }
+.pa-grade { font-family: var(--kr); font-weight: 300; font-size: clamp(2.4rem, 5vw, 4.4rem); line-height: 1; letter-spacing: -0.04em; }
+.pa-award { font-family: var(--kr); font-size: 0.95rem; font-weight: 400; word-break: keep-all; }
+.pa-edu-m { font-size: 1rem; font-weight: 400; }
+.pa-edu-s { font-size: 0.8rem; color: var(--dim); }
+.pa-edu-st { font-size: 0.9rem; font-weight: 500; }
+.pa-bar { width: min(100%, 30rem); height: 1px; background: rgb(236 236 238 / 0.12); }
+.pa-bar i { display: block; height: 1px; width: var(--p); background: var(--ink); }
+.pa-l.pa-when--split, .pa-hop .pa-when--split { width: min(100%, 30rem); }
+.pa-certs { list-style: none; margin: 0; padding: 0; width: 100%; max-width: 30rem; }
+.pa-certs li { display: grid; justify-items: center; gap: 0.2rem; padding: 0.85rem 0; border-top: 1px solid rgb(236 236 238 / 0.08); }
+.pa-certs span { font-size: 1.15rem; font-weight: 400; letter-spacing: -0.01em; }
+.pa-certs em { font-style: normal; font-size: 0.74rem; color: var(--dim); }
+
+/* ---------- the project drawings: glass, with packets ----------
+   The diagrams of the committed design (hybrid-scene, lab-scene, stream-scene), set in a pane of glass
+   so the tree shows through it, blurred. Parts start hidden and play once the pane has data-in.
+   --d is a part's delay in the choreography, --dur a packet's loop period. The signal is the ink
+   of this page, not a colour; red is kept for what it means there: an overlap, a lost frame. */
+.pa-fig {
+    --signal: #f4f4f6; --alert: #f87171; --glow: rgb(244 244 246 / 0.75);
+    --pkt-face: rgb(244 244 246 / 0.42); --pkt-void: rgb(244 244 246 / 0.08); --pkt-lost: rgb(248 113 113 / 0.46); --pkt-rim: 0.7;
+    --foreground: #ececee; --muted-foreground: #9a9aa2;
+    width: min(100%, 40rem); padding: clamp(0.9rem, 2.4vw, 1.5rem); border-radius: 0.9rem; text-align: left;
+    background: linear-gradient(135deg, rgb(255 255 255 / 0.055), rgb(255 255 255 / 0.012) 42%, rgb(255 255 255 / 0.03)), rgb(11 11 12 / 0.58);
+    -webkit-backdrop-filter: blur(14px) saturate(1.1); backdrop-filter: blur(14px) saturate(1.1);
+    box-shadow: inset 0 0 0 1px rgb(236 236 238 / 0.09), inset 0 1px 0 rgb(255 255 255 / 0.16), 0 2rem 3rem -2rem rgb(0 0 0 / 0.7);
+}
+.pa-fig .viz { display: block; width: 100%; height: auto; overflow: visible; --rim-on: rgb(214 244 255 / 0.5); --rim-mid: rgb(214 244 255 / 0.16); --rim-off: rgb(214 244 255 / 0.04); --spec: rgb(255 252 244 / 0.11); --spec2: rgb(255 252 244 / 0.04); }
+.pa-fig .viz text { font-family: var(--ui); font-size: 10px; letter-spacing: 0; font-variant-numeric: tabular-nums; text-rendering: geometricPrecision; fill: rgb(236 236 238 / 0.6); text-shadow: none; }
+.pa-fig .viz text.name { font-size: 11.5px; font-weight: 600; letter-spacing: -0.01em; fill: var(--foreground); }
+.pa-fig .viz text.addr { font-family: var(--mo); font-size: 9px; fill: var(--muted-foreground); }
+.pa-fig .viz text.tag { font-size: 9px; font-weight: 500; fill: var(--muted-foreground); }
+.pa-fig .viz .ico { color: var(--muted-foreground); }
+.pa-fig .viz text.tag.addr { font-size: 8.5px; font-weight: 400; }
+.pa-fig .viz text.note { font-size: 10px; fill: var(--muted-foreground); }
+.pa-fig .viz text.sigtext { fill: var(--signal); }
+.pa-fig .viz text.clash { fill: var(--alert); }
+.pa-fig .viz .box { fill: none; stroke-width: 0.8; }
+.pa-fig .v-hyb .box, .pa-fig .v-hyb .frame { stroke: url(#hyb-rim); }
+.pa-fig .v-lab .box, .pa-fig .v-lab .frame { stroke: url(#lab-rim); }
+.pa-fig .v-str .box, .pa-fig .v-str .frame { stroke: url(#str-rim); }
+.pa-fig .viz .glow { display: none; }
+.pa-fig .viz .frame { fill: none; stroke-width: 0.8; stroke-opacity: 0.55; }
+.pa-fig .viz .wire { fill: none; stroke: rgb(236 236 238 / 0.3); stroke-width: 1; }
+.pa-fig .viz .wire.wg { stroke-dasharray: 0.03 0.02; }
+.pa-fig .viz .draw { stroke-dasharray: 1; stroke-dashoffset: 1; }
+.pa-fig .viz .fade { opacity: 0; }
+.pa-fig .viz .fill { fill-opacity: 0; }
+.pa-fig .viz .pk { fill: var(--pkt-face); stroke: var(--signal); stroke-width: var(--pkt-rim); filter: drop-shadow(0 0 2.5px var(--glow)); offset-rotate: auto; opacity: 0; }
+.pa-fig .viz .pk.hollow { fill: var(--pkt-void); }
+.pa-fig[data-in] .viz .draw { animation: vz-draw 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both; animation-delay: var(--d, 0s); }
+.pa-fig[data-in] .viz .fade { animation: vz-fade 0.7s ease both; animation-delay: var(--d, 0s); }
+.pa-fig[data-in] .viz .draw.fill { animation: vz-draw 0.9s cubic-bezier(0.2, 0.7, 0.2, 1) both, vz-fill 0.7s ease both; animation-delay: var(--d, 0s), calc(var(--d, 0s) + 0.6s); }
+.pa-fig[data-in] .viz .pk { animation: vz-pk var(--dur, 4s) linear infinite; animation-delay: var(--d, 0s); }
+@keyframes vz-draw { to { stroke-dashoffset: 0; } }
+@keyframes vz-fade { to { opacity: 1; } }
+@keyframes vz-fill { to { fill-opacity: 1; } }
+@keyframes vz-pk { 0% { offset-distance: 0%; opacity: 0; animation-timing-function: cubic-bezier(0.45, 0.05, 0.3, 1); } 4% { opacity: 1; } 46% { opacity: 1; } 50% { offset-distance: 100%; opacity: 0; } 100% { offset-distance: 100%; opacity: 0; } }
+/* on a phone the drawing keeps a readable size and the pane scrolls sideways */
+/* …and the pane is darker instead of blurred, and skipped while off screen: a blurred, scrolling pane over a canvas that redraws every frame costs a phone frames (measured) */
+@media (max-width: 600px) { .pa-fig { overflow-x: auto; content-visibility: auto; contain-intrinsic-size: auto 18rem; -webkit-backdrop-filter: none; backdrop-filter: none; background: linear-gradient(135deg, rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.012) 42%, rgb(255 255 255 / 0.03)), rgb(11 11 12 / 0.84); } .pa-fig .viz { min-width: 32rem; } }
+/* TCP and UDP: one clock per lane. --t counts seconds 0..12 and loops; every frame, ack and player cell is a function of it. */
+@property --t { syntax: "<number>"; inherits: true; initial-value: 0; }
+.pa-fig .stream .lane { --t: 0; }
+.pa-fig[data-in] .stream .lane { animation: pa-clock 12s linear infinite; }
+@keyframes pa-clock { to { --t: 12; } }
+.pa-fig .stream .fr { fill: var(--pkt-face); stroke: var(--signal); stroke-width: var(--pkt-rim); filter: drop-shadow(0 0 2.5px var(--glow)); offset-rotate: auto; offset-distance: calc(clamp(0, (var(--t) - var(--leave)) / 3, 1) * 100%); opacity: clamp(0, min(var(--t) - var(--leave), var(--leave) + 3.15 - var(--t)) * 20, 1); }
+.pa-fig .stream .fr.ack { fill: var(--pkt-void); }
+.pa-fig .stream .fr.lost { fill: var(--pkt-lost); stroke: var(--alert); offset-distance: calc(clamp(0, (var(--t) - var(--leave)) / 3, 0.5) * 100%); opacity: clamp(0, min(var(--t) - var(--leave), var(--leave) + 1.7 - var(--t)) * 4, 1); }
+.pa-fig .stream .cell { fill: var(--signal); opacity: calc(0.16 + 0.84 * clamp(0, (var(--t) - var(--on, 99)) * 20, 1)); }
+.pa-fig .stream .cell.skip { fill: none; stroke: var(--alert); stroke-dasharray: 2 2; opacity: 1; }
+
+/* the four ways out, as marks */
+.pa-ways { display: flex; justify-content: center; align-items: center; gap: 0.7rem; margin-top: 0.4rem; }
+.pa-way { display: inline-flex; align-items: center; justify-content: center; width: 2.5rem; height: 2.5rem; border: 1px solid rgb(236 236 238 / 0.16); border-radius: 0.55rem; color: var(--dim); transition: color 0.25s, border-color 0.25s, transform 0.35s cubic-bezier(0.16, 1, 0.3, 1); }
+.pa-way svg { width: 1.05rem; height: 1.05rem; }
+.pa-way:hover, .pa-way:focus-visible { color: var(--ink); border-color: rgb(236 236 238 / 0.5); transform: translateY(-2px); outline: none; }
+.pa-ways--big { gap: 1rem; margin: 0.4rem 0 0.8rem; }
+.pa-ways--big .pa-way { width: 3.8rem; height: 3.8rem; border-radius: 0.8rem; color: var(--ink); }
+.pa-ways--big .pa-way svg { width: 1.6rem; height: 1.6rem; }
+.pa-mail { font-family: var(--mo); font-size: 0.76rem; letter-spacing: 0.08em; color: var(--dim); }
+.pa-build { font-family: var(--mo); font-size: 0.6rem; line-height: 1.7; color: var(--faint); max-width: 34rem; }
+
+/* ---------- the open: the name in front of the tree ----------
+   Nothing is cleared behind the words: no pool of dark, no gap in the tree. Each glyph carries its
+   own thin shadow in the ground colour, which is enough to keep it off the grains. */
+.pa-open { align-content: center; }
+/* every line of type carries its own thin shadow in the ground colour: that is all that stands between it and the tree */
+.pa-hop :is(p, h2, h3, li, span, em, a) { text-shadow: 0 0 2px var(--ground), 0 0 5px var(--ground), 0 0 10px var(--ground), 0 0 18px rgb(11 11 12 / 0.8); }
+.pa-ways--big .pa-way { background: rgb(11 11 12 / 0.6); }
+.pa-open .pa-ko { text-shadow: 0 0 0.06em var(--ground), 0 0 0.25em var(--ground), 0 0 0.6em rgb(11 11 12 / 0.7); }
+.pa-open .pa-la, .pa-open .pa-role { color: rgb(236 236 238 / 0.82); text-shadow: 0 0 2px var(--ground), 0 0 5px var(--ground), 0 0 10px var(--ground), 0 0 18px rgb(11 11 12 / 0.8); }
+.pa-open .pa-way { background: rgb(11 11 12 / 0.6); color: rgb(236 236 238 / 0.82); }
+.pa-open .pa-in { gap: 0.8rem; }
+.pa-name { margin: 0; display: grid; gap: 0.7rem; justify-items: center; }
+.pa-ko { display: block; font-family: var(--kr); font-weight: 300; font-size: clamp(2.6rem, 5vw, 4.6rem); line-height: 1; letter-spacing: -0.03em; }
+.pa-la { display: block; font-family: var(--mo); font-size: 0.64rem; letter-spacing: 0.46em; color: var(--dim); padding-left: 0.46em; }
+.pa-role { margin: 0; font-size: 0.9rem; font-weight: 300; color: var(--dim); letter-spacing: 0.01em; }
+.pa-cue { margin: 1.6rem 0 0; height: 2.6rem; width: 1px; position: relative; overflow: hidden; background: rgb(236 236 238 / 0.1); }
+.pa-cue i { position: absolute; left: 0; top: 0; width: 100%; height: 40%; background: var(--dim); animation: pa-cue 2.2s cubic-bezier(0.6, 0, 0.3, 1) infinite; }
+@keyframes pa-cue { from { transform: translateY(-100%); } to { transform: translateY(260%); } }
+
+/* ---------- arriving ----------
+   Ease out, always: fast in, slow stop. Carried by the section's position, a beat apart. */
+@supports (animation-timeline: view()) {
+    .pa-l { animation: pa-in linear both; animation-timeline: --stop; animation-range: cover calc(14% + var(--i, 0) * 1.4%) cover calc(30% + var(--i, 0) * 1.4%); }
+    @keyframes pa-in { from { opacity: 0; transform: translate3d(0, 0.6rem, 0); } }
+    .pa-open .pa-l, .pa-open .pa-ko, .pa-open .pa-la, .pa-open .pa-role, .pa-open .pa-cue { animation-timeline: auto; animation-range: normal; }
+}
+.pa-open .pa-ko, .pa-open .pa-la, .pa-open .pa-role, .pa-open .pa-l, .pa-open .pa-cue { animation: pa-in 1.4s cubic-bezier(0.16, 1, 0.3, 1) both; animation-delay: calc(2s + var(--i, 0) * 0.12s); }
+.pa-open .pa-cue i { animation-delay: 0s; }
+@media (prefers-reduced-motion: reduce) {
+    .pa-l, .pa-ko, .pa-la, .pa-role, .pa-cue { animation: none !important; opacity: 1 !important; transform: none !important; }
+    .pa-cue i { animation: none !important; }
+    .pa-fig .viz .draw, .pa-fig .viz .fade, .pa-fig .viz .fill { animation: none !important; opacity: 1 !important; stroke-dashoffset: 0 !important; fill-opacity: 1 !important; }
+    .pa-fig .viz .pk { display: none; }
+    .pa-fig .stream .lane { animation: none !important; --t: 11.5; }
+}

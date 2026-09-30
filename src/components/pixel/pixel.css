@@ -1,0 +1,141 @@
+/* The terminal. Every class is px- prefixed; Tailwind owns the bare names.
+
+   One typeface (Geist Mono), one phosphor (green), one grid. Nothing is a card and nothing has a
+   shadow: a terminal has none. Hierarchy is done the way a shell does it — by what is bright, what
+   is dim, and what is indented. */
+
+body {
+    --mo: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+    --kr: "Apple SD Gothic Neo", var(--font-kr), system-ui, sans-serif;
+    --ground: #070907;
+    --ink: #d9e2da;
+    --dim: #6f7f72;
+    --faint: #3f4a42;
+    --ph: #7ee787;
+    --ph-hi: #c6ffcd;
+    --pad: clamp(1.1rem, 4vw, 4rem);
+    background: var(--ground);
+    color: var(--ink);
+    font-family: var(--mo);
+    font-size: 13.5px;
+    line-height: 1.62;
+    overflow-x: clip;
+}
+.px-site { position: relative; }
+::selection { background: var(--ph); color: #071a0c; }
+.px-grid { position: fixed; inset: 0; z-index: 0; display: block; }
+main { position: relative; z-index: 1; }
+
+/* scanlines and a little curvature at the corners: the glass in front of the phosphor */
+.px-crt {
+    position: fixed; inset: 0; z-index: 2; pointer-events: none;
+    background:
+        repeating-linear-gradient(180deg, rgb(0 0 0 / 0.16) 0 1px, transparent 1px 3px),
+        radial-gradient(ellipse 80% 70% at 50% 50%, transparent 55%, rgb(0 0 0 / 0.5) 100%);
+}
+
+/* ---------- the status line ---------- */
+.px-bar { position: fixed; z-index: 30; inset: 0 0 auto; display: flex; justify-content: space-between; gap: 1rem; padding: 0.55rem var(--pad); font-size: 0.78rem; letter-spacing: 0.02em; color: var(--dim); background: linear-gradient(180deg, rgb(7 9 7 / 0.92), rgb(7 9 7 / 0)); }
+.px-bar b { color: var(--ph); font-weight: 600; }
+.px-bar i { font-style: normal; color: var(--ink); }
+.px-bar-r { color: var(--ph); }
+
+/* ---------- a command and its output ---------- */
+.px-hop { position: relative; view-timeline-name: --cmd; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1fr); align-content: center; padding: 5.5rem var(--pad) 4rem; }
+.px-in { display: grid; grid-template-columns: minmax(0, 1fr); gap: 0.35rem; max-width: 40rem; }
+@media (min-width: 900px) {
+    /* the words keep the left of the screen; the network stands in the right, drawn by the grid */
+    .px-in { max-width: 38vw; }
+    .px-hop::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(90deg, rgb(7 9 7 / 0.9) 0%, rgb(7 9 7 / 0.85) 36%, rgb(7 9 7 / 0.3) 46%, transparent 54%); }
+}
+@media (max-width: 899px) {
+    .px-hop { align-content: end; padding-top: 46svh; }
+    .px-hop::after { content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none; background: linear-gradient(180deg, transparent 0%, rgb(7 9 7 / 0.3) 36%, rgb(7 9 7 / 0.92) 48%); }
+}
+.px-cmd { margin: 0 0 0.9rem; color: var(--ink); }
+.px-cmd i { font-style: normal; color: var(--ph); margin-right: 0.15rem; }
+.px-ln, .px-blk { margin: 0; }
+.px-dim { color: var(--dim); }
+.px-t { display: inline-block; min-width: 9.5rem; color: var(--dim); }
+.px-t--r { min-width: 0; margin-left: 0.8rem; }
+.px-ln b { color: var(--ink); font-weight: 600; }
+.px-ln a { color: var(--ph); text-decoration: none; }
+.px-ln a:hover, .px-ln a:focus-visible { color: var(--ph-hi); text-decoration: underline; text-underline-offset: 0.2em; }
+.px-links a { margin-right: 0.9rem; }
+
+/* headlines drawn as glyphs */
+.px-head { display: block; margin: 0.4rem 0 0.9rem; max-width: 100%; height: auto; }
+.px-head--big { margin-top: 0.2rem; }
+.px-head-ko { font-family: var(--kr); font-weight: 700; font-size: clamp(1.25rem, 2.2vw, 1.7rem); line-height: 1.3; letter-spacing: -0.02em; margin: 0.3rem 0 0.7rem; word-break: keep-all; }
+.px-say { font-family: var(--kr); font-weight: 500; font-size: clamp(1.2rem, 2.1vw, 1.7rem); line-height: 1.5; letter-spacing: -0.02em; max-width: 26ch; word-break: keep-all; margin: 0.3rem 0 0.8rem; }
+.px-phase { color: var(--ph); letter-spacing: 0.04em; }
+.px-sum { font-family: var(--kr); font-size: 0.92rem; line-height: 1.7; color: rgb(217 226 218 / 0.86); max-width: 44rem; word-break: keep-all; margin: 0.2rem 0 0.8rem; }
+.px-dec { list-style: none; margin: 0 0 0.6rem; padding: 0; display: grid; gap: 0.25rem; }
+.px-dec li { font-family: var(--kr); font-size: 0.84rem; line-height: 1.62; color: var(--dim); max-width: 44rem; word-break: keep-all; padding-left: 1.1rem; text-indent: -1.1rem; }
+.px-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.2rem; }
+.px-list li { font-family: var(--kr); }
+.px-list .px-t { font-family: var(--mo); }
+.px-cols { display: grid; gap: 0.9rem 2rem; grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr)); }
+.px-dir { color: var(--ph); }
+.px-tree { color: var(--faint); margin-right: 0.5rem; }
+.px-exp article { margin-bottom: 0.9rem; }
+.px-exp .px-blk { font-family: var(--kr); font-size: 0.84rem; line-height: 1.62; color: var(--dim); padding-left: 1.1rem; text-indent: -1.1rem; word-break: keep-all; }
+.px-exp-h b { font-family: var(--kr); }
+.px-exp-h i { font-style: normal; color: var(--faint); font-size: 0.8rem; }
+.px-exp-h em { font-style: normal; color: var(--ph); }
+.px-prog { color: var(--ph); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.px-out { list-style: none; margin: 0; padding: 0; display: grid; gap: 0.25rem; }
+.px-out a { overflow-wrap: anywhere; }
+.px-build { margin-top: 0.8rem; max-width: 44rem; }
+
+/* the project: words on the left, the screenshot as a framed buffer on the right */
+.px-proj { display: grid; grid-template-columns: minmax(0, 1fr); gap: 1rem; }
+.px-shot { border: 1px solid var(--faint); padding: 0.35rem; background: rgb(7 9 7 / 0.7); }
+.px-shot img { display: block; width: 100%; height: auto; filter: saturate(0.85) contrast(1.05); }
+.px-cap { display: block; margin-top: 0.35rem; color: var(--dim); font-size: 0.72rem; }
+@media (min-width: 900px) {
+    .px-hop:has(.px-shot) .px-in { max-width: 88vw; }
+    .px-hop:has(.px-shot)::after { background: linear-gradient(90deg, rgb(7 9 7 / 0.92) 0%, rgb(7 9 7 / 0.9) 60%, rgb(7 9 7 / 0.7) 100%); }
+    .px-proj:has(.px-shot) { grid-template-columns: minmax(0, 46fr) minmax(0, 40fr); column-gap: 2.5rem; align-items: start; }
+}
+
+/* ---------- boot ---------- */
+.px-boot { list-style: none; margin: 0 0 1.4rem; padding: 0; display: grid; gap: 0.15rem; font-size: 0.8rem; color: var(--dim); }
+.px-boot b { color: var(--ph); font-weight: 600; }
+.px-boot i { font-style: normal; color: var(--faint); }
+.px-boot .px-t { min-width: 3.6rem; color: var(--faint); }
+.px-name { margin: 0; display: grid; gap: 0.6rem; }
+.px-name-ko { display: block; max-width: 100%; height: auto; }
+.px-name-la { display: block; color: var(--ph); letter-spacing: 0.42em; font-size: 0.82rem; }
+.px-role { margin: 0.2rem 0 0; color: var(--ink); font-size: 0.95rem; }
+.px-cursor { margin: 1.4rem 0 0; color: var(--ph); }
+.px-cursor i { font-style: normal; }
+.px-cursor span { display: inline-block; width: 0.6em; height: 1.1em; vertical-align: -0.2em; background: var(--ph); animation: px-blink 1.05s steps(1) infinite; }
+.px-cursor--end { margin-top: 1rem; }
+@keyframes px-blink { 50% { opacity: 0; } }
+
+/* ---------- the typing ----------
+   Output is typed as the section comes into view. A line is clipped from the right and revealed in
+   steps, which is what a character-at-a-time reveal looks like; a block is revealed top to bottom.
+   All of it is driven by the section's position, so scrolling back untypes it. */
+@supports (animation-timeline: view()) {
+    .px-cmd, .px-ln, .px-blk {
+        animation: px-type steps(28, end) both;
+        animation-timeline: --cmd;
+        animation-range: cover calc(12% + var(--i, 0) * 1.1%) cover calc(16% + var(--i, 0) * 1.1%);
+    }
+    .px-blk { animation-name: px-drop; animation-timing-function: steps(10, end); animation-range: cover calc(12% + var(--i, 0) * 1.1%) cover calc(19% + var(--i, 0) * 1.1%); }
+    @keyframes px-type { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0 -1% 0 0); } }
+    @keyframes px-drop { from { clip-path: inset(0 0 100% 0); } to { clip-path: inset(0 0 -2% 0); } }
+    .px-open .px-ln, .px-open .px-blk, .px-open .px-cmd { animation-timeline: auto; animation-range: normal; }
+}
+/* the boot runs on its own clock */
+.px-boot li { animation: px-type 0.5s steps(22, end) both; animation-delay: calc(0.15s + var(--i, 0) * 0.17s); }
+.px-name-la, .px-role { animation: px-type 0.7s steps(20, end) both; animation-delay: calc(1.25s + var(--i, 0) * 0.16s); }
+.px-cursor { animation: px-in 0.3s steps(1) 2.9s both; }
+@keyframes px-in { from { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+    .px-cmd, .px-ln, .px-blk, .px-boot li, .px-name-la, .px-role, .px-cursor, .px-cursor span { animation: none !important; clip-path: none !important; opacity: 1 !important; }
+    .px-crt { display: none; }
+}

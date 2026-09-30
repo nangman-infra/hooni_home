@@ -1,0 +1,54 @@
+/* The layout of the clean design, on top of particle.css (which keeps the type, the glass drawings and
+   the arrival of lines). Words on the left, a room for the figure on the right; on a phone the room
+   comes first and the words follow. Nothing is ever behind the type, so nothing needs a shadow. */
+
+.mo-site { --accent: #f0b33e; } /* the one accent; morph.tsx draws with the same colour */
+html:has(.mo-site) { scroll-behavior: smooth; }
+.mo-canvas { position: fixed; inset: 0; z-index: 1; display: block; pointer-events: none; }
+.mo-sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+.mo-hop { width: 100%; max-width: 88rem; margin-inline: auto; grid-template-columns: minmax(0, 32rem) minmax(0, 1fr); column-gap: clamp(2.5rem, 6vw, 7rem); row-gap: 2.2rem; align-content: center; align-items: center; justify-items: stretch; text-align: left; }
+.mo-hop .pa-in { justify-items: start; text-align: left; max-width: none; }
+.mo-hop :is(p, h2, h3, li, span, em, a) { text-shadow: none; }
+.mo-hop :is(.pa-say, .pa-sum) { margin-inline: 0; }
+/* the statement is two lines, broken where it was asked to break: the size gives the first line room */
+.mo-hop .pa-say { font-size: clamp(0.78rem, 3.35vw, 1.2rem); }
+.mo-hop .pa-cols { gap: 1.2rem 1.4rem; }
+.mo-hop :is(.pa-phase, .pa-links) { justify-content: flex-start; }
+.mo-hop :is(.pa-exp article, .pa-certs li) { justify-items: start; }
+.mo-hop :is(.pa-hist, .pa-dec, .pa-exp, .pa-cols, .pa-certs, .pa-exp ul) { width: 100%; max-width: none; }
+.mo-hop .pa-certs li:first-child, .mo-hop .pa-exp article:first-child, .mo-hop .pa-hist li:first-child { border-top: 0; }
+
+/* the room */
+.mo-stage { position: relative; min-width: 0; height: min(64svh, 36rem); }
+.mo-stage--media { height: auto; display: grid; justify-items: center; padding: 1.2rem; }
+/* a drawing or a picture stands in the room as it is; the grains are its frame */
+.mo-site .pa-fig { width: min(100%, 40rem); border-radius: 4px; box-shadow: none; -webkit-backdrop-filter: none; backdrop-filter: none; background: linear-gradient(135deg, rgb(255 255 255 / 0.035), rgb(255 255 255 / 0.008) 45%, rgb(255 255 255 / 0.022));
+    --signal: var(--accent); --glow: rgb(240 179 62 / 0.7); --pkt-face: rgb(240 179 62 / 0.46); --pkt-void: rgb(240 179 62 / 0.1); }
+.mo-site .pa-shot { width: min(100%, 40rem); border: 0; border-radius: 4px; }
+
+/* the first and the last section stand on the centre line */
+.mo-mid { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
+.mo-mid .pa-in { justify-items: center; text-align: center; max-width: 44rem; }
+.mo-stage--name { width: min(100%, 44rem); height: auto; aspect-ratio: 3 / 1; }
+.mo-stage--line { width: min(100%, 64rem); height: auto; aspect-ratio: 6 / 1; }
+.mo-site .pa-open :is(.pa-la, .pa-role, .pa-l, .pa-cue) { animation-delay: calc(0.8s + var(--i, 0) * 0.09s); }
+
+/* where you are */
+.mo-idx { position: fixed; z-index: 30; right: clamp(0.5rem, 1.4vw, 1.3rem); top: 50%; translate: 0 -50%; display: grid; gap: 0.35rem; }
+.mo-idx a { display: grid; place-items: center end; width: 1.6rem; height: 0.7rem; }
+.mo-idx i { display: block; width: 0.45rem; height: 1px; background: var(--faint); transition: width 0.35s cubic-bezier(0.16, 1, 0.3, 1), background 0.35s; }
+.mo-idx a:hover i, .mo-idx a:focus-visible i { width: 0.9rem; background: var(--ink); }
+.mo-idx a:focus-visible { outline: none; }
+:root[data-hop="0"] .mo-idx a[data-k="0"] i, :root[data-hop="1"] .mo-idx a[data-k="1"] i, :root[data-hop="2"] .mo-idx a[data-k="2"] i, :root[data-hop="3"] .mo-idx a[data-k="3"] i, :root[data-hop="4"] .mo-idx a[data-k="4"] i, :root[data-hop="5"] .mo-idx a[data-k="5"] i, :root[data-hop="6"] .mo-idx a[data-k="6"] i, :root[data-hop="7"] .mo-idx a[data-k="7"] i, :root[data-hop="8"] .mo-idx a[data-k="8"] i, :root[data-hop="9"] .mo-idx a[data-k="9"] i, :root[data-hop="10"] .mo-idx a[data-k="10"] i, :root[data-hop="11"] .mo-idx a[data-k="11"] i, :root[data-hop="12"] .mo-idx a[data-k="12"] i, :root[data-hop="13"] .mo-idx a[data-k="13"] i { width: 1.3rem; background: var(--accent); }
+
+@media (max-width: 899px) {
+    .mo-hop { grid-template-columns: minmax(0, 1fr); align-content: start; padding-top: 4.5rem; padding-bottom: 3.5rem; }
+    .mo-stage { order: -1; height: 36svh; }
+    .mo-stage--media { height: auto; padding: 0.9rem 0.6rem; }
+    .mo-mid { align-content: center; }
+    .mo-stage--name, .mo-stage--line { order: 0; height: auto; }
+    .mo-idx { display: none; }
+    .mo-site .pa-top { display: none; }
+}
+@media (prefers-reduced-motion: reduce) { html:has(.mo-site) { scroll-behavior: auto; } }

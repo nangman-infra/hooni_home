@@ -1,49 +1,21 @@
-"use client"
+import type { Metadata } from "next"
+import { ME } from "@/components/trace/content"
+import { PixelPage } from "@/components/pixel/page"
+import { ParticlePage } from "@/components/particle/page"
+import { AsciiPage } from "@/components/ascii/page"
+import { MorphPage } from "@/components/morph/page"
 
-import { Nav } from "@/components/nav";
-import { Hero } from "@/components/hero";
-import { LightField } from "@/components/light-field";
-import { Scene } from "@/components/scene";
-import { Spine } from "@/components/spine";
-import { Summary } from "@/components/summary";
-import { History } from "@/components/history";
-import { TechStack } from "@/components/tech-stack";
-import { ProjectScene, projectCount } from "@/components/projects";
-import { Experience } from "@/components/experience";
-import { Awards } from "@/components/awards";
-import { Education } from "@/components/education";
-import { Certifications } from "@/components/certifications";
-import { Footer } from "@/components/footer";
+export const metadata: Metadata = {
+    title: "정희훈",
+    description: ME.statement,
+}
 
-// One full-screen scene per section; projects get one scene each.
-const scenes: { id?: string; title: string; node: React.ReactNode }[] = [
-  { title: "Summary", node: <Summary /> },
-  { title: "History", node: <History /> },
-  { id: "skills", title: "Core Focus", node: <TechStack /> },
-  ...Array.from({ length: projectCount }, (_, i) => ({ id: i === 0 ? "projects" : undefined, title: `Project ${i + 1}`, node: <ProjectScene index={i} /> })),
-  { id: "experience", title: "Experience", node: <Experience /> },
-  { id: "awards", title: "Awards", node: <Awards /> },
-  { id: "education", title: "Education", node: <Education /> },
-  { id: "certifications", title: "Certifications", node: <Certifications /> },
-  { title: "Contact", node: <Footer /> },
-]
-
+/* One site, several looks, chosen when the server starts. All read the same content.ts.
+     DESIGN=morph     the clean one — words on the left, one figure of grains per section     (port 3001)
+     DESIGN=particle  the tree the camera circles — kept for reference
+     DESIGN=ascii     the posters — kept for reference
+     DESIGN=pixel     the terminal (the default) */
 export default function Home() {
-  return (
-    // Hero is fixed behind; the scenes slide over it (mt-[100vh]). Below 1024px the hero flows normally.
-    <main className="relative bg-background text-foreground antialiased selection:bg-foreground selection:text-background">
-      <Nav />
-      <div className="fixed inset-0 h-screen w-full z-0 max-lg:relative max-lg:inset-auto max-lg:h-auto">
-        <Hero />
-      </div>
-      <div id="resume" className="relative z-10 w-full mt-[100vh] max-lg:mt-0 scroll-mt-20 bg-background shadow-[0_-20px_53.333px_-26.667px_var(--lift)] max-lg:shadow-none">
-        {/* the same ground of light the hero stands on, carried under the whole resume */}
-        <div className="fixed inset-0 z-0 pointer-events-none"><LightField calm /></div>
-        {scenes.map((s, i) => (
-          <Scene key={i} id={s.id} title={s.title}>{s.node}</Scene>
-        ))}
-      </div>
-      <Spine />
-    </main>
-  );
+    const d = process.env.DESIGN
+    return d === "morph" ? <MorphPage /> : d === "ascii" ? <AsciiPage /> : d === "particle" ? <ParticlePage /> : <PixelPage />
 }
