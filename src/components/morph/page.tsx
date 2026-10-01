@@ -62,21 +62,19 @@ export function MorphPage() {
         <div className="pa-site mo-site">
             <Pulse />
             <Morph progress={progress(EDUCATION.start, EDUCATION.end)} />
-            <header className="pa-top" aria-hidden="true"><span>{ME.name}</span><span>{ME.role}</span></header>
             <nav className="mo-idx" aria-label="Sections">
                 {TITLES.map((title, i) => <a key={i} href={`#s-${i}`} data-k={i} aria-label={title || ME.name} title={title || ME.name}><i /></a>)}
             </nav>
 
             <main>
                 <section className="pa-hop mo-hop mo-mid pa-open" data-hop={0} data-title="" id="s-0">
-                    <div className="mo-stage mo-stage--name" aria-hidden="true" />
+                    <div className="mo-stage mo-stage--tree" aria-hidden="true" />
                     <div className="pa-in">
-                        <h1 className="mo-sr">{ME.name}</h1>
-                        <span className="pa-la" style={{ "--i": 0 } as CSSProperties}>{ME.latin}</span>
+                        <h1 className="mo-name pa-l" style={{ "--i": 0 } as CSSProperties}>{ME.latin}</h1>
                         <p className="pa-role" style={{ "--i": 1 } as CSSProperties}>{ME.role}</p>
                         <Ways from={2} />
-                        <p className="pa-cue" style={{ "--i": 7 } as CSSProperties} aria-hidden="true"><i /></p>
                     </div>
+                    <p className="pa-cue" style={{ "--i": 7 } as CSSProperties} aria-hidden="true"><i /></p>
                 </section>
 
                 <Stop n={1}>
@@ -152,14 +150,13 @@ export function MorphPage() {
                     <ul className="pa-certs">{CERTS.map((c, i) => <li key={c.name} className="pa-l" style={{ "--i": 2 + i * 1.5 } as CSSProperties}><span>{c.name}</span><em>{c.issuer}</em></li>)}</ul>
                 </Stop>
 
-                <section className="pa-hop mo-hop mo-mid" data-hop={13} data-title="Contact" id="s-13">
-                    <div className="mo-stage mo-stage--line" aria-hidden="true" />
+                <section className="pa-hop mo-hop mo-mid mo-last" data-hop={13} data-title="Contact" id="s-13">
                     <div className="pa-in">
                         <L i={0} className="pa-tag"><span>13</span><i /><span>Contact</span></L>
                         <Ways big from={1} />
-                        <L i={7}><p className="pa-mail">{ME.email}</p></L>
-                        <L i={8}><p className="pa-build">{BUILD}</p></L>
                     </div>
+                    <div className="mo-stage mo-stage--end" aria-hidden="true" />
+                    <L i={8}><p className="pa-build">{BUILD}</p></L>
                 </section>
             </main>
         </div>

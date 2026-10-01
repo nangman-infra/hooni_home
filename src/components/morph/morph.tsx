@@ -2,8 +2,8 @@
 
 import { useEffect, useRef } from "react"
 import { mulberry } from "@/components/particle/tree"
-import { EDUCATION, ME } from "@/components/trace/content"
-import { SAMPLES, awardFig, certFig, eduFig, fanFig, focusFig, frameFig, lineFig, nameFig, timeFig, treeFig, type Fig } from "@/components/morph/figures"
+import { EDUCATION } from "@/components/trace/content"
+import { SAMPLES, awardFig, certFig, eduFig, fanFig, focusFig, frameFig, rootFig, stackFig, timeFig, treeFig, type Fig } from "@/components/morph/figures"
 
 /* One set of grains, and a figure for every section.
 
@@ -20,6 +20,8 @@ const ACC = "240,179,62" // the one accent; morph.css has the same colour as --a
 const INK = "236,236,238"
 const BA = [0.1, 0.2, 0.34, 0.5, 0.7, 0.95]
 const STAGGER = 0.55
+const HOLD = 7 // seconds a route on the tree stays picked out
+const PACE = 2.2 // sections a second, at most, that the grains cover when the page moves
 
 export function Morph({ progress }: Readonly<{ progress: number }>) {
     const ref = useRef<HTMLCanvasElement>(null)
@@ -40,22 +42,54 @@ export function Morph({ progress }: Readonly<{ progress: number }>) {
         let raf = 0, last = 0, t = 0, SS = -1
         let ptx = -1e5, pty = -1e5
         const pulses: { x: number; y: number; t: number }[] = []
-        let QX = 0, QY = 0, QF = 1
+        let QX = 0, QY = 0, QF = 1, QU = -1 // where a grain is, how visible, and how far along its line (-1: it is not on one)
+        let GR = 2 // how far the first figure has grown (over 1.16: all of it)
+        const LIT: number[] = [] // the routes picked out on the tree just now
         const sm = (a: number, b: number, x: number) => { const k = Math.max(0, Math.min(1, (x - a) / (b - a))); return k * k * (3 - 2 * k) }
 
         const build = () => {
-            N = innerWidth < 700 ? 3200 : 6500
+            N = innerWidth < 700 ? 3600 : 9000
             builtFor = innerWidth
-            const rand = mulberry(11), d = new Date(), now = d.getFullYear() + d.getMonth() / 12 + (d.getDate() - 1) / 365
+            const rand = mulberry(11), hist = histRoom(), ends = endWays()
+            endSig = signEnds(ends)
+            histSig = sign(hist)
             const fa = frameFig(N, rand), fb = frameFig(N, rand)
-            figs = [nameFig(N, rand, ME.name, KR), treeFig(N, rand), timeFig(N, rand, now), focusFig(N, rand), fa, fb, fa, fb, fa, fanFig(N, rand), awardFig(N, rand), eduFig(N, rand, progress, EDUCATION.start, EDUCATION.end), certFig(N, rand), lineFig(N, rand)]
+            figs = [treeFig(N, rand), stackFig(N, rand), timeFig(N, rand, now(), hist), focusFig(N, rand), fa, fb, fa, fb, fa, fanFig(N, rand), awardFig(N, rand), eduFig(N, rand, progress, EDUCATION.start, EDUCATION.end), certFig(N, rand), rootFig(N, rand, ends)]
             ox = new Float32Array(N); oy = new Float32Array(N); vx = new Float32Array(N); vy = new Float32Array(N); rs = new Float32Array(N); wv = new Float32Array(N)
             for (let i = 0; i < N; i++) { rs[i] = rand(); wv[i] = (rand() - 0.5) * 0.36 }
             bk = Array.from({ length: BA.length * 2 }, () => new Float32Array(N * 3))
-            // arriving: the grains start scattered and gather
-            if (!still.matches && t < 0.2) for (let i = 0; i < N; i++) { const a = rand() * 6.283, r = (0.06 + rand() * 0.3) * Math.max(innerWidth, innerHeight) * Math.min(devicePixelRatio || 1, 2); ox[i] = Math.cos(a) * r; oy[i] = Math.sin(a) * r }
         }
+        const now = () => { const d = new Date(); return d.getFullYear() + d.getMonth() / 12 + (d.getDate() - 1) / 365 }
+        // the History list's lines, as heights in the room of its figure, so each bar stands level with its line.
+        // Only when the two stand side by side; on a phone they are stacked and the figure keeps its own spacing.
+        let histSig = ""
+        // (layout offsets, summed up to the page, not client rects: the lines come in with a small slide, and a rect
+        // taken mid-slide is lower than the line will be)
+        const at0 = (el: HTMLElement) => { let x = 0, y = 0; for (let e: HTMLElement | null = el; e; e = e.offsetParent as HTMLElement | null) { x += e.offsetLeft; y += e.offsetTop } return { x, y } }
+        const histRoom = () => {
+            const sec = document.querySelector('main section[data-hop="2"]'), st = sec?.querySelector<HTMLElement>(".mo-stage")
+            const when = sec ? Array.from(sec.querySelectorAll<HTMLElement>(".pa-hist .pa-when")) : []
+            if (!st?.offsetHeight || !when.length) return undefined
+            const s0 = at0(st), w0 = at0(when[0])
+            if (w0.x + when[0].offsetWidth > s0.x) return undefined
+            return { ar: st.offsetWidth / st.offsetHeight, ys: when.map((el) => (at0(el).y + el.offsetHeight / 2 - s0.y) / st.offsetHeight) }
+        }
+        // the foot of each way to reach him in the last section, in the units of the room under them (its height), so the
+        // trunk there can branch into them
+        let endSig = ""
+        const endWays = () => {
+            const sec = document.querySelector('main section[data-hop="13"]'), st = sec?.querySelector<HTMLElement>(".mo-stage")
+            const ways = sec ? Array.from(sec.querySelectorAll<HTMLElement>(".pa-way")) : []
+            if (!st?.offsetHeight || !ways.length) return undefined
+            const s0 = at0(st), H = st.offsetHeight
+            return ways.map((el) => { const p = at0(el); return [(p.x + el.offsetWidth / 2 - s0.x) / H, (p.y + el.offsetHeight - s0.y) / H] as [number, number] })
+        }
+        const signEnds = (e?: [number, number][]) => (e ? e.map(([x, y]) => `${x.toFixed(3)},${y.toFixed(3)}`).join(";") : "")
+        const sign = (h?: { ar: number; ys: number[] }) => (h ? `${h.ar.toFixed(2)}:${h.ys.map((y) => y.toFixed(3)).join(",")}` : "")
         const measure = () => {
+            // the list can change its lines (a font arriving, a width that wraps a row): then the timeline is drawn again to match
+            if (figs.length) { const h = histRoom(), sig = sign(h); if (sig !== histSig) { histSig = sig; figs[2] = timeFig(N, mulberry(12), now(), h) } }
+            if (figs.length) { const e = endWays(), sig = signEnds(e); if (sig !== endSig) { endSig = sig; figs[13] = rootFig(N, mulberry(13), e) } }
             const secs = Array.from(document.querySelectorAll<HTMLElement>("main section[data-hop]"))
             mids = secs.map((el) => { const r = el.getBoundingClientRect(); return r.top + scrollY + r.height / 2 })
             stages = secs.map((el) => el.querySelector<HTMLElement>(".mo-stage") ?? el)
@@ -101,13 +135,14 @@ export function Morph({ progress }: Readonly<{ progress: number }>) {
         }
         // where grain i of figure f is at time tt → QX, QY, and QF (how visible: grains fade at the ends of an open line)
         const at = (f: Fig, R: number[], B: number[], i: number, tt: number) => {
-            QF = 1
+            QF = 1; QU = -1
             if (f.frame) { let u = (f.x[i] + tt * f.cs[i]) % 1; if (u < 0) u += 1; around(R, u, f.y[i] * dpr); return }
             const c = f.cv[i]
             if (c < 0) { QX = B[0] + f.x[i] * B[2]; QY = B[1] + f.y[i] * B[3]; return }
             let u = (f.cu[i] + tt * f.cs[i]) % 1
             if (u < 0) u += 1
             if (!f.closed[c] && f.cs[i] !== 0) QF = Math.min(1, u / 0.05, (1 - u) / 0.05)
+            QU = u
             const q = u * (SAMPLES - 1), i0 = Math.min(SAMPLES - 2, Math.floor(q)), k = q - i0, cu = f.curves[c]
             QX = B[0] + (cu[i0 * 2] + (cu[i0 * 2 + 2] - cu[i0 * 2]) * k + f.x[i]) * B[2]
             QY = B[1] + (cu[i0 * 2 + 1] + (cu[i0 * 2 + 3] - cu[i0 * 2 + 1]) * k + f.y[i]) * B[3]
@@ -136,17 +171,24 @@ export function Morph({ progress }: Readonly<{ progress: number }>) {
                 g.strokeStyle = `rgba(${ACC},${(0.8 * al).toFixed(3)})`; g.lineWidth = dpr * 1.1; g.stroke(); g.setLineDash([])
                 return
             }
-            for (const l of f.lines) { g.strokeStyle = `rgba(${l.acc ? ACC : INK},${(l.a * al).toFixed(3)})`; g.lineWidth = dpr * 0.8; g.stroke(trace(f, B, l.c)) }
-            let lit = -1
-            if (f.paths.length) {
-                // one route through the tree is picked out: the one under the pointer, or each in turn
-                lit = Math.floor(tt / 2.6) * 7 % f.paths.length
-                if (ptx > R[0] && ptx < R[0] + R[2] && pty > R[1] && pty < R[1] + R[3]) { let bd = 1e9; for (let q = 0; q < f.paths.length; q++) { const n = f.nodes[q], d = Math.hypot(B[0] + n.x * B[2] - ptx, B[1] + n.y * B[3] - pty); if (d < bd) { bd = d; lit = q } } }
-                g.strokeStyle = `rgba(${ACC},${(0.9 * al).toFixed(3)})`; g.lineWidth = dpr * 1.3; g.stroke(trace(f, B, f.paths[lit]))
-                const cu = f.curves[f.paths[lit]], q = ((tt * 0.45) % 1) * (SAMPLES - 1), i0 = Math.min(SAMPLES - 2, Math.floor(q)), k = q - i0
-                dot(B[0] + (cu[i0 * 2] + (cu[i0 * 2 + 2] - cu[i0 * 2]) * k) * B[2], B[1] + (cu[i0 * 2 + 1] + (cu[i0 * 2 + 3] - cu[i0 * 2 + 1]) * k) * B[3], dpr * 2.4, true, false, al)
+            const seen = (far?: number) => (f.grows && far !== undefined ? sm(far, far + 0.12, GR) : 1)
+            for (const l of f.lines) { g.strokeStyle = `rgba(${l.acc ? ACC : INK},${(l.a * al * seen(l.at)).toFixed(3)})`; g.lineWidth = dpr * 0.8; g.stroke(trace(f, B, l.c)) }
+            LIT.length = 0
+            if (f.paths.length && (!f.grows || GR > 1.15)) {
+                // routes through the tree are picked out, one after another: each comes up softly, something goes along it once, and it fades.
+                // The one under the pointer stays lit.
+                for (let j = 0, many = f.grows ? 2 : 1; j < many; j++) {
+                    const turn = tt / HOLD + j / many, ph = turn % 1
+                    let lit = (Math.floor(turn) * 7 + j * 23) % f.paths.length, show = sm(0, 0.15, ph) * (1 - sm(0.85, 1, ph)), along = ph
+                    if (!j && ptx > R[0] && ptx < R[0] + R[2] && pty > R[1] && pty < R[1] + R[3]) { let bd = 1e9; for (let q = 0; q < f.paths.length; q++) { const n = f.nodes[q], d = Math.hypot(B[0] + n.x * B[2] - ptx, B[1] + n.y * B[3] - pty); if (d < bd) { bd = d; lit = q } } show = 1; along = (tt * 0.2) % 1 }
+                    if (show < 0.02) continue
+                    LIT.push(lit)
+                    g.strokeStyle = `rgba(${ACC},${(0.85 * al * show).toFixed(3)})`; g.lineWidth = dpr * 1.3; g.stroke(trace(f, B, f.paths[lit]))
+                    const cu = f.curves[f.paths[lit]], q = along * (SAMPLES - 1), i0 = Math.min(SAMPLES - 2, Math.floor(q)), k = q - i0
+                    dot(B[0] + (cu[i0 * 2] + (cu[i0 * 2 + 2] - cu[i0 * 2]) * k) * B[2], B[1] + (cu[i0 * 2 + 1] + (cu[i0 * 2 + 3] - cu[i0 * 2 + 1]) * k) * B[3], dpr * 2.4, true, false, al * show)
+                }
             }
-            f.nodes.forEach((n, q) => dot(B[0] + n.x * B[2], B[1] + n.y * B[3], n.r * dpr * (q === lit ? 1.8 : 1), !!n.acc || q === lit, !!n.ring, al))
+            f.nodes.forEach((n, q) => { const lit = LIT.includes(q); dot(B[0] + n.x * B[2], B[1] + n.y * B[3], n.r * dpr * (lit ? 1.8 : 1), !!n.acc || lit, !!n.ring, al * seen(n.at)) })
             g.textBaseline = "middle"
             for (const l of f.labels) {
                 const ko = /[가-힣]/.test(l.t)
@@ -163,13 +205,17 @@ export function Morph({ progress }: Readonly<{ progress: number }>) {
             t += dt
             const calm = still.matches, tt = calm ? 0 : t
             const target = where(), whole = Math.floor(target), S = whole + sm(0.2, 0.8, target - whole)
-            SS = SS < 0 || calm ? S : SS + (S - SS) * Math.min(1, dt * 12)
+            // the grains follow the page at their own pace, not the hand's: about a section a second, more only when they are far behind
+            const lag = S - SS, pace = (PACE + 2.4 * Math.max(0, Math.abs(lag) - 1)) * dt
+            SS = SS < 0 || calm ? S : SS + Math.max(-pace, Math.min(pace, lag * Math.min(1, dt * 8)))
             const k = Math.max(0, Math.min(figs.length - 2, Math.floor(SS))), mm = Math.max(0, Math.min(1, SS - k))
             const A = figs[k], Bf = figs[k + 1]
             room(k, RA); box(A, RA, BXA)
             if (mm > 0) { room(k + 1, RB); box(Bf, RB, BXB) }
             const arrive = calm ? 1 : sm(0, 0.7, t), stiff = calm ? 0 : 14 + 76 * sm(0, 1.2, t), damp = Math.exp(-dt * (5 + 11 * sm(0, 1.2, t)))
 
+            // arriving: the first figure grows from its root, slowly, then fast, then slowly
+            GR = calm || t > 3 ? 2 : 1.17 * sm(0.15, 2.6, t)
             g.clearRect(0, 0, w, h)
             g.globalCompositeOperation = "source-over"
             chrome(A, RA, BXA, (1 - sm(0.1, 0.4, mm)) * arrive, tt)
@@ -181,6 +227,7 @@ export function Morph({ progress }: Readonly<{ progress: number }>) {
             for (let i = 0; i < N; i++) {
                 at(A, RA, BXA, i, tt)
                 let x = QX, y = QY, al = A.a[i] * QF, s = A.s[i], acc = A.acc[i]
+                if (GR < 1.17 && A.grows) al *= A.cv[i] < 0 ? sm(A.cu[i] - 0.06, A.cu[i] + 0.04, GR) : 1 - sm(GR - 0.07, GR, QU)
                 if (mm > 0) {
                     at(Bf, RB, BXB, i, tt)
                     let mi = Math.max(0, Math.min(1, mm * (1 + STAGGER) - STAGGER * rs[i]))
@@ -214,8 +261,6 @@ export function Morph({ progress }: Readonly<{ progress: number }>) {
                 for (let j = 0; j < cnt[b]; j++) g.rect(arr[j * 3], arr[j * 3 + 1], arr[j * 3 + 2], arr[j * 3 + 2])
                 g.fill()
             }
-            // the ring a click sends out
-            for (const P of pulses) { const age = (t - P.t) / 1.4; g.strokeStyle = `rgba(${ACC},${(0.5 * (1 - age) ** 2).toFixed(3)})`; g.lineWidth = dpr; g.beginPath(); g.arc(P.x, P.y, (t - P.t) * 1150 * dpr, 0, 6.283); g.stroke() }
             g.globalCompositeOperation = "source-over"
         }
 
@@ -235,8 +280,8 @@ export function Morph({ progress }: Readonly<{ progress: number }>) {
         const ro = new ResizeObserver(() => { measure(); if (still.matches) once() })
         let alive = true
 
-        // the name is set from the page's own Korean face, so wait for it
-        document.fonts.load(`600 100px ${KR}`, ME.name).catch(() => null).then(() => {
+        // the figures' words are set in the page's own faces, so wait for them
+        document.fonts.ready.catch(() => null).then(() => {
             if (!alive) return
             size()
             const main = document.querySelector("main")

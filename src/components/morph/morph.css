@@ -30,9 +30,27 @@ html:has(.mo-site) { scroll-behavior: smooth; }
 /* the first and the last section stand on the centre line */
 .mo-mid { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
 .mo-mid .pa-in { justify-items: center; text-align: center; max-width: 44rem; }
-.mo-stage--name { width: min(100%, 44rem); height: auto; aspect-ratio: 3 / 1; }
-.mo-stage--line { width: min(100%, 64rem); height: auto; aspect-ratio: 6 / 1; }
+/* the first screen: the tree, as large as the window lets it be, and under it — where its root is —
+   the name in plain type, what he is, and where to find him */
+.mo-mid.pa-open { padding-top: 4rem; padding-bottom: 3rem; row-gap: 1rem; }
+.mo-stage--tree { width: min(100%, 62rem, calc((100svh - 23rem) * 1.5)); height: auto; aspect-ratio: 3 / 2; }
+.mo-name { margin: 0 0 0.5rem; padding-left: 0.16em; font: 300 clamp(1.4rem, 4.2vw, 3.6rem) / 1.1 var(--ui); letter-spacing: 0.16em; white-space: nowrap; }
+.mo-mid.pa-open .pa-cue { margin-top: 0.2rem; }
+/* the last screen: the ways to reach him at the top, and under them, down to the foot of the page, the roots */
+/* the last screen: the ways to reach him; under them the trunk of the tree, which comes up out of the ground and
+   reaches each of them; under the ground its roots; and at the foot of the page, how the site is built */
+.mo-last { padding-bottom: 1.6rem; row-gap: 0; }
+.mo-last .pa-in { margin-bottom: 3rem; }
+.mo-last > .pa-l { margin-top: 1rem; }
+.mo-stage--end { width: min(100%, 80rem, calc((100svh - 25rem) * 2.3)); height: auto; aspect-ratio: 2.3; }
 .mo-site .pa-open :is(.pa-la, .pa-role, .pa-l, .pa-cue) { animation-delay: calc(0.8s + var(--i, 0) * 0.09s); }
+
+/* History: beside the list, the room of the timeline is as tall as the list, so that every bar can stand
+   level with its line (morph.tsx measures where the lines are); the room under the list is for the years */
+@media (min-width: 900px) {
+    .mo-hop[data-hop="2"] .mo-stage { align-self: stretch; height: auto; }
+    .mo-hop[data-hop="2"] .pa-in { padding-bottom: 3.6rem; }
+}
 
 /* where you are */
 .mo-idx { position: fixed; z-index: 30; right: clamp(0.5rem, 1.4vw, 1.3rem); top: 50%; translate: 0 -50%; display: grid; gap: 0.35rem; }
@@ -47,7 +65,7 @@ html:has(.mo-site) { scroll-behavior: smooth; }
     .mo-stage { order: -1; height: 36svh; }
     .mo-stage--media { height: auto; padding: 0.9rem 0.6rem; }
     .mo-mid { align-content: center; }
-    .mo-stage--name, .mo-stage--line { order: 0; height: auto; }
+    .mo-stage--tree, .mo-stage--end { order: 0; height: auto; }
     .mo-idx { display: none; }
     .mo-site .pa-top { display: none; }
 }
