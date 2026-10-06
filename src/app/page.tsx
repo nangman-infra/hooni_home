@@ -11,11 +11,11 @@ export const metadata: Metadata = {
 }
 
 /* One site, several looks, chosen when the server starts. All read the same content.ts.
-     DESIGN=morph     the clean one — words on the left, one figure of grains per section     (port 3001)
+     (none)           the tree — words beside one figure of grains per section (morph; what is deployed)
      DESIGN=particle  the tree the camera circles — kept for reference
      DESIGN=ascii     the posters — kept for reference
-     DESIGN=pixel     the terminal (the default) */
+     DESIGN=pixel     the terminal — the earlier site */
 export default function Home() {
     const d = process.env.DESIGN
-    return d === "morph" ? <MorphPage /> : d === "ascii" ? <AsciiPage /> : d === "particle" ? <ParticlePage /> : <PixelPage />
+    return d === "pixel" ? <PixelPage /> : d === "ascii" ? <AsciiPage /> : d === "particle" ? <ParticlePage /> : <MorphPage />
 }
