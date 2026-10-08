@@ -1,3 +1,4 @@
+import { mulberry } from "@/components/particle/tree"
 import { CERTS, EXPERIENCE, FOCUS, HISTORY, ME, PHASES } from "@/components/trace/content"
 
 /* The figures. One per section, each a drawing made of the same grains: where every grain sits (or
@@ -6,7 +7,7 @@ import { CERTS, EXPERIENCE, FOCUS, HISTORY, ME, PHASES } from "@/components/trac
    Everything is authored in a box whose height is 1 and whose width is `ar`, then stored with x
    divided by `ar`, so the engine can lay the box into whatever room the page gives it. */
 
-export type Node = { x: number; y: number; r: number; acc?: boolean; ring?: boolean; at?: number }
+export type Node = { x: number; y: number; r: number; acc?: boolean; ring?: boolean; at?: number; blink?: number } // blink: under 1 a light that breathes, from 1 one that is busy (bursts of quick blinks); the fraction is its own pace
 export type Label = { x: number; y: number; t: string; al: CanvasTextAlign; big?: boolean; acc?: boolean }
 export type Line = { c: number; a: number; acc?: boolean; at?: number }
 export type Fig = {
@@ -15,8 +16,9 @@ export type Fig = {
     cv: Int16Array; cu: Float32Array; cs: Float32Array // the curve a grain runs along (-1: it stays put), where on it, how fast
     curves: Float32Array[]; closed: boolean[]
     lines: Line[]; nodes: Node[]; labels: Label[]
-    paths: number[] // curves that can be picked out: on the tree, root to each tip
-    grows?: boolean // drawn from its root outward when the page arrives: a line, a node (`at`) or a grain shows once the growth has reached it
+    paths: number[] // curves that can be picked out: on the racks, server to server
+    grows?: boolean // built up when the page arrives: a line or a node (`at`) shows once the growth has reached it
+    at?: Float32Array // ... and so does each grain
 }
 
 export const SAMPLES = 72
@@ -28,32 +30,53 @@ function make(n: number, ar: number, rand: Rand, frame = false) {
         frame, ar, x: new Float32Array(n), y: new Float32Array(n), a: new Float32Array(n), s: new Float32Array(n), acc: new Uint8Array(n),
         cv: new Int16Array(n).fill(-1), cu: new Float32Array(n), cs: new Float32Array(n), curves: [], closed: [], lines: [], nodes: [], labels: [], paths: [],
     }
-    let i = 0
+    let i = 0, when = 0
     const g = () => (rand() + rand() + rand() - 1.5) * 0.82
     // a grain at a place
-    const put = (x: number, y: number, a: number, s = 1, acc = 0) => { if (i >= n) return; f.x[i] = x / ar; f.y[i] = y; f.a[i] = a; f.s[i] = s; f.acc[i] = acc; i++ }
+    const put = (x: number, y: number, a: number, s = 1, acc = 0) => { if (i >= n) return; f.x[i] = x / ar; f.y[i] = y; f.a[i] = a; f.s[i] = s; f.acc[i] = acc; if (f.at) f.at[i] = when; i++ }
     // a grain running along a curve, a little off its centre
-    const run = (c: number, u: number, speed: number, off: number, a: number, s = 1, acc = 0) => { if (i >= n) return; f.cv[i] = c; f.cu[i] = u; f.cs[i] = speed; f.x[i] = (g() * off) / ar; f.y[i] = g() * off; f.a[i] = a; f.s[i] = s; f.acc[i] = acc; i++ }
-    // a polyline, resampled evenly along its length
-    const curve = (pts: Pt[], closed = false) => {
-        const len = [0]
-        for (let k = 1; k < pts.length; k++) len.push(len[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]))
-        const out = new Float32Array(SAMPLES * 2), total = len[len.length - 1] || 1
-        let k = 1
-        for (let q = 0; q < SAMPLES; q++) {
-            const d = (q / (SAMPLES - 1)) * total
-            while (k < pts.length - 1 && len[k] < d) k++
-            const w = (d - len[k - 1]) / (len[k] - len[k - 1] || 1)
-            out[q * 2] = (pts[k - 1][0] + (pts[k][0] - pts[k - 1][0]) * w) / ar; out[q * 2 + 1] = pts[k - 1][1] + (pts[k][1] - pts[k - 1][1]) * w
-        }
-        f.curves.push(out); f.closed.push(closed)
-        return f.curves.length - 1
-    }
-    const node = (x: number, y: number, r: number, acc = false, ring = false, at?: number) => f.nodes.push({ x: x / ar, y, r, acc, ring, at })
+    const run = (c: number, u: number, speed: number, off: number, a: number, s = 1, acc = 0) => { if (i >= n) return; f.cv[i] = c; f.cu[i] = u; f.cs[i] = speed; f.x[i] = (g() * off) / ar; f.y[i] = g() * off; f.a[i] = a; f.s[i] = s; f.acc[i] = acc; if (f.at) f.at[i] = when; i++ }
+    // a polyline, resampled along its length
+    const curve = (pts: Pt[], closed = false) => { f.curves.push(resample(pts, ar)); f.closed.push(closed); return f.curves.length - 1 }
+    const node = (x: number, y: number, r: number, acc = false, ring = false, at?: number, blink?: number) => f.nodes.push({ x: x / ar, y, r, acc, ring, at, blink })
     const label = (x: number, y: number, t: string, al: CanvasTextAlign = "center", big = false, acc = false) => f.labels.push({ x: x / ar, y, t, al, big, acc })
     // whatever is left over is dust in the air round the drawing
     const dust = () => { while (i < n) put(ar * (0.5 + g() * 0.42), 0.5 + g() * 0.4, 0.1 + rand() * 0.12, 0.8) }
-    return { f, put, run, curve, node, label, dust, g, count: (share: number) => Math.round(n * share) }
+    // the grains placed from now on show once the growth has got to v
+    const from = (v: number) => { if (!f.grows) return; f.at ??= new Float32Array(n); when = v }
+    return { f, put, run, curve, node, label, dust, from, g, count: (share: number) => Math.round(n * share) }
+}
+type B = ReturnType<typeof make>
+// a polyline as SAMPLES points (x divided by ar), evenly along its length — except that every sharp corner gets a point of
+// its own, so that a right angle stays a right angle instead of being cut across
+function resample(pts: Pt[], ar: number): Float32Array {
+    const len = [0]
+    for (let k = 1; k < pts.length; k++) len.push(len[k - 1] + Math.hypot(pts[k][0] - pts[k - 1][0], pts[k][1] - pts[k - 1][1]))
+    const out = new Float32Array(SAMPLES * 2)
+    let k = 1
+    stops(pts, len).forEach((d, q) => {
+        while (k < pts.length - 1 && len[k] < d) k++
+        const w = (d - len[k - 1]) / (len[k] - len[k - 1] || 1)
+        out[q * 2] = (pts[k - 1][0] + (pts[k][0] - pts[k - 1][0]) * w) / ar; out[q * 2 + 1] = pts[k - 1][1] + (pts[k][1] - pts[k - 1][1]) * w
+    })
+    return out
+}
+// where along the line (as distances) the SAMPLES points go: the stretches between sharp corners share them by length
+function stops(pts: Pt[], len: number[]): number[] {
+    const total = len[len.length - 1] || 1, cut = [0], free = SAMPLES - 1
+    for (let k = 1; k < pts.length - 1; k++) {
+        const a = Math.atan2(pts[k][1] - pts[k - 1][1], pts[k][0] - pts[k - 1][0]), b = Math.atan2(pts[k + 1][1] - pts[k][1], pts[k + 1][0] - pts[k][0])
+        const sharp = Math.abs(Math.atan2(Math.sin(b - a), Math.cos(b - a))) > 0.5 && len[k] - len[k - 1] > 1e-6 && len[k + 1] - len[k] > 1e-6
+        if (sharp) cut.push(len[k])
+    }
+    cut.push(total)
+    // too many corners to give each a point: evenly, as before
+    if (cut.length > free / 2) return Array.from({ length: SAMPLES }, (_, q) => (q / free) * total)
+    const share = cut.slice(1).map((c, s) => Math.max(1, Math.round(((c - cut[s]) / total) * free)))
+    share[share.indexOf(Math.max(...share))] += free - share.reduce((sum, m) => sum + m, 0)
+    const d = [0]
+    share.forEach((m, s) => { for (let q = 1; q <= m; q++) d.push(cut[s] + ((cut[s + 1] - cut[s]) * q) / m) })
+    return d
 }
 const circle = (cx: number, cy: number, r: number, from = 0, to = Math.PI * 2, steps = 96): Pt[] => Array.from({ length: steps + 1 }, (_, k) => { const a = from + ((to - from) * k) / steps; return [cx + Math.cos(a) * r, cy + Math.sin(a) * r] as Pt })
 const ellipse = (cx: number, cy: number, rx: number, ry: number, rot = 0, steps = 96): Pt[] => Array.from({ length: steps + 1 }, (_, k) => { const a = (k / steps) * Math.PI * 2, x = Math.cos(a) * rx, y = Math.sin(a) * ry; return [cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)] as Pt })
@@ -66,48 +89,114 @@ const hermite = (p0: Pt, a0: number, p1: Pt, a1: number, pull: number, steps = 1
     })
 }
 
-/* the tree of the first screen: every tip has a route back to the root, and the grains run the routes.
-   It is the grand one — a wide crown of sixty-four tips in blossom, some of it in the accent — and it
-   grows: each branch, fork and grain knows how far from the root it is (`at`, or where it is on its
-   route), and the engine shows it when the growth gets there. */
-export function treeFig(n: number, rand: Rand): Fig {
-    const ar = 1.5, b = make(n, ar, rand)
-    b.f.grows = true
-    const segs: { pts: Pt[]; from: number }[] = [], tips: { p: Pt; path: Pt[] }[] = [], forks: { p: Pt; far: number }[] = []
-    let reach = 0
-    const grow = (p0: Pt, aIn: number, ang: number, len: number, depth: number, path: Pt[], far: number) => {
-        const p1: Pt = [p0[0] + Math.sin(ang) * len, p0[1] - Math.cos(ang) * len]
-        const seg = hermite(p0, aIn, p1, ang, len * 1.05)
-        segs.push({ pts: seg, from: far })
-        const here = path.concat(seg)
-        if (depth === 0) { tips.push({ p: p1, path: here }); reach = Math.max(reach, far + len); return }
-        forks.push({ p: p1, far: far + len })
-        const spread = (0.36 + 0.22 * rand()) * (0.74 + depth * 0.07)
-        grow(p1, ang, ang - spread * (0.85 + rand() * 0.3), len * (0.7 + rand() * 0.08), depth - 1, here, far + len)
-        grow(p1, ang, ang + spread * (0.85 + rand() * 0.3), len * (0.7 + rand() * 0.08), depth - 1, here, far + len)
+/* the first screen: a row of racks in a data hall, from the front. Each is filled from the floor up — servers,
+   bigger servers, shelves of disks, a gap here and there — under the switch they are cabled to and a patch
+   panel. The cables go up the managers between the racks into the tray overhead and across, and a route is
+   one server to a server in another rack: packets run the routes, each route at its own pace and both ways.
+   The lights do what lights in a hall do: some steady, some breathing, some busy. It is built when the page
+   arrives: the racks fill from the bottom up, and as they top out the cables come in. */
+const RW = 0.2, GAP = 0.035, RT = 0.19, FL = 0.95, SLOTS = 26, SLOT = (FL - RT - 0.024) / SLOTS, TRAY = 0.09
+const DISKS = 3, SWITCH = 4, PATCH = 5 // a unit's kind; 1–3 is also its height in slots (1, 2: servers)
+type Unit = { x: number; y: number; w: number; h: number; kind: number; at: number }
+// the face of each kind, as rows of dots (vents, bays, ports): [columns, rows, spacing, brightness]
+const FACE: Record<number, [number, number, number, number]> = { 1: [5, 1, 0.006, 0.3], 2: [6, 2, 0.012, 0.35], 3: [7, 3, 0.014, 0.4], 4: [12, 2, 0.0085, 0.5], 5: [16, 1, 0.0085, 0.5] }
+// where the racks stand in the first screen's box, and the cable managers between them: a rack uses the one on its
+// right, the last one the one on its left, so the row is the same both ways
+const XS = Array.from({ length: 5 }, (_, r) => 0.18 + r * (RW + GAP)), LANES = XS.slice(1).map((x) => x - GAP / 2)
+// what the racks hold: the same every time, so that the last screen can show the backs of the very same racks
+const hall = () => { const rand = mulberry(11); return XS.map((x, r) => fill(rand, x, 0.1 + r * 0.03)) }
+
+// what one rack holds, from the floor up; `lag`: when it starts to fill
+function fill(rand: Rand, x: number, lag: number): Unit[] {
+    const out: Unit[] = []
+    const slot = (s: number, h: number, kind: number) => out.push({ x: x + 0.014, y: FL - 0.012 - (s + h) * SLOT + 0.003, w: RW - 0.028, h: h * SLOT - 0.006, kind, at: lag + 0.74 * (s / SLOTS) })
+    let s = 0
+    while (s < SLOTS - 2) {
+        // now and then a slot or two left empty
+        if (rand() < 0.15) { s += 1 + Math.floor(rand() * 2); continue }
+        const h = Math.min([1, 1, 1, 2, 2, 3][Math.floor(rand() * 6)], SLOTS - 2 - s)
+        slot(s, h, h)
+        s += h
     }
-    grow([0, 0], 0, 0, 0.27, 6, [], 0)
-    // fit the whole thing into the box, standing on its bottom edge
-    let x0 = 1e9, x1 = -1e9, y0 = 1e9, y1 = -1e9
-    for (const s of segs) for (const p of s.pts) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]); y1 = Math.max(y1, p[1]) }
-    const k = Math.min((ar * 0.92) / (x1 - x0), 0.9 / (y1 - y0)), ox = ar / 2 - ((x0 + x1) / 2) * k, oy = 0.97 - y1 * k
-    const fit = (p: Pt): Pt => [p[0] * k + ox, p[1] * k + oy]
-    // lower branches are drawn stronger than the twigs
-    for (const s of segs) b.f.lines.push({ c: b.curve(s.pts.map(fit)), a: 0.34 - 0.2 * (s.from / reach), at: s.from / reach })
-    for (const t of tips) { b.f.paths.push(b.curve(t.path.map(fit))); const p = fit(t.p); b.node(p[0], p[1], 1.5, false, false, 1) }
-    for (const f of forks) { const q = fit(f.p); b.node(q[0], q[1], 1, false, false, f.far / reach) }
-    // the ground it stands on
-    const root = fit([0, 0]), ground = b.curve([[root[0] - 0.34, root[1]], [root[0] + 0.34, root[1]]])
-    b.f.lines.push({ c: ground, a: 0.16, at: 0 })
-    for (let q = b.count(0.025); q > 0; q--) b.run(ground, 0.5 + b.g() * 0.3, 0, 0.003, 0.2 + rand() * 0.4, 0.8)
-    // what goes up the routes, a little of it in the accent; and the trunk, which is thick
-    for (let q = b.count(0.5); q > 0; q--) b.run(b.f.paths[Math.floor(rand() * tips.length)], rand(), 0.028 + rand() * 0.04, 0.0035, 0.45 + rand() * 0.5, 0.8 + rand() * 0.6, rand() < 0.03 ? 1 : 0)
-    for (let q = b.count(0.05); q > 0; q--) b.run(b.f.paths[Math.floor(rand() * tips.length)], rand() * 0.3, 0, 0.011 * (1 - rand() * rand()), 0.3 + rand() * 0.5)
-    // the blossom at every tip
-    for (let q = b.count(0.38); q > 0; q--) { const p = fit(tips[Math.floor(rand() * tips.length)].p), big = rand() < 0.07; b.put(p[0] + b.g() * 0.042, p[1] + b.g() * 0.036, big ? 0.95 : 0.25 + rand() * 0.55, big ? 1.8 : 0.8 + rand() * 0.55, rand() < 0.26 ? 1 : 0) }
+    slot(SLOTS - 2, 1, SWITCH)
+    slot(SLOTS - 1, 1, PATCH)
+    return out
+}
+// a cable from a server in one rack to a server in another: out of the side of it nearer the manager its rack uses, up the
+// manager into the tray, across, down and in
+function route(units: Unit[][], rand: Rand) {
+    const a = Math.floor(rand() * units.length), z = (a + 1 + Math.floor(rand() * (units.length - 1))) % units.length
+    const lane = (r: number) => LANES[Math.min(r, LANES.length - 1)] + (rand() - 0.5) * 0.008
+    const pick = (r: number) => { const s = units[r].filter((u) => u.kind <= DISKS); return s[Math.floor(rand() * s.length)] }
+    const port = (u: Unit, x: number): Pt => [x > u.x ? u.x + u.w - 0.012 : u.x + 0.012, u.y + u.h / 2]
+    const la = lane(a), lz = lane(z), u = pick(a), v = pick(z), p = port(u, la), q = port(v, lz), y = TRAY + (rand() - 0.5) * 0.022
+    // the light it starts from shows with the server it is on
+    return { pts: [p, [la, p[1]], [la, y], [lz, y], [lz, q[1]], q] as Pt[], start: p, at: u.at + 0.05 }
+}
+// a rack's frame and rails, [x, y, w, h]
+function rack(b: B, [x, y, w, h]: number[], at: number, rand: Rand, grains: number) {
+    b.from(at)
+    const frame = b.curve(rrect(x, y, w, h, 0.006), true)
+    b.f.lines.push({ c: frame, a: 0.3, at })
+    for (const rx of [x + 0.008, x + w - 0.008]) b.f.lines.push({ c: b.curve([[rx, y + 0.01], [rx, y + h - 0.01]]), a: 0.07, at })
+    for (let q = grains; q > 0; q--) b.run(frame, rand(), 0.003 + rand() * 0.004, 0.003, 0.3 + rand() * 0.5, 0.9)
+}
+// a unit's outline and (with `face`) its face: vents, bays, ports
+function shell(b: B, u: Unit, rand: Rand, dens: number, face = true) {
+    const c = b.curve(rrect(u.x, u.y, u.w, u.h, 0.003), true)
+    b.f.lines.push({ c, a: 0.18, at: u.at })
+    for (let q = Math.round(2 * (u.w + u.h) * dens); q > 0; q--) b.run(c, rand(), 0, 0.0015, 0.22 + rand() * 0.38, 0.8)
+    if (!face) return
+    const [cols, rows, dx, a] = FACE[u.kind]
+    for (let r = 0; r < rows; r++) for (let k = 0; k < cols; k++) b.put(u.x + 0.016 + k * dx, u.y + ((r + 0.5) / rows) * u.h, a, 0.85)
+}
+// the front of a unit, and its lights: one steady; one busy with what the server is doing, or breathing (a few of those in
+// the accent); on the switch, a light over every other port, busy
+function unit(b: B, u: Unit, rand: Rand, dens: number) {
+    b.from(u.at)
+    shell(b, u, rand, dens)
+    const lx = u.x + u.w - 0.012, cy = u.y + u.h / 2, mood = rand()
+    b.node(lx - 0.011, cy, 0.8, false, false, u.at + 0.04)
+    b.node(lx, cy, 1.05, mood > 0.92, false, u.at + 0.05, mood < 0.5 ? 1 + rand() : rand())
+    if (u.kind === SWITCH) for (let k = 0; k < 12; k += 2) b.node(u.x + 0.016 + k * 0.0085, u.y + u.h * 0.25, 0.55, false, false, u.at + 0.05, 1 + rand())
+}
+// the raised floor the racks stand on, [x0, x1, y]: the tiles and their seams
+function deck(b: B, [x0, x1, y]: number[], rand: Rand, share: number) {
+    b.from(0)
+    const c = b.curve([[x0, y], [x1, y]])
+    b.f.lines.push({ c, a: 0.2, at: 0 }, { c: b.curve([[x0, y + 0.022], [x1, y + 0.022]]), a: 0.08, at: 0 })
+    for (let x = x0 + 0.06; x < x1 - 0.01; x += 0.1) b.f.lines.push({ c: b.curve([[x, y], [x, y + 0.022]]), a: 0.1, at: 0 })
+    for (let q = b.count(share); q > 0; q--) b.run(c, rand(), 0, 0.003, 0.2 + rand() * 0.4, 0.8)
+}
+// what goes along the cables (the figure's paths): packets — short trains of grains, each cable at its own pace, some of them
+// going back the other way (`back`: how many) — over a thin steady flow
+function traffic(b: B, rand: Rand, share: number, back: number) {
+    const P = b.f.paths, pace = P.map(() => 0.02 + rand() * 0.06)
+    for (let q = b.count(share * 0.3); q > 0; q--) b.run(P[Math.floor(rand() * P.length)], rand(), 0.012 + rand() * 0.02, 0.0025, 0.2 + rand() * 0.3, 0.8)
+    let left = b.count(share * 0.7)
+    while (left > 0) {
+        const k = Math.floor(rand() * P.length), u = rand(), many = 4 + Math.floor(rand() * 12), acc = rand() < 0.03 ? 1 : 0, sp = pace[k] * (rand() < back ? -1 : 1) * (1 - 0.3 * acc)
+        for (let q = 0; q < many; q++) b.run(P[k], u + q * 0.004, sp, 0.0016, 0.55 + rand() * 0.45, 0.9 + rand() * 0.4, acc)
+        left -= many
+    }
+}
+export function rackFig(n: number, rand: Rand): Fig {
+    const ar = 1.5, b = make(n, ar, rand), units = hall()
+    b.f.grows = true
+    // the routes come first: the light each starts from is the node the pointer picks
+    for (let k = 0; k < 18; k++) { const r = route(units, rand); b.f.paths.push(b.curve(r.pts)); b.node(r.start[0], r.start[1], 1.3, false, false, r.at) }
+    deck(b, [0.04, ar - 0.04, FL], rand, 0.025)
+    XS.forEach((x, r) => rack(b, [x, RT, RW, FL - RT], 0.02 + r * 0.03, rand, b.count(0.025)))
+    const all = units.flat(), dens = b.count(0.3) / all.reduce((sum, u) => sum + 2 * (u.w + u.h), 0)
+    for (const u of all) unit(b, u, rand, dens)
+    // the tray overhead (a ladder), the managers down from it, and what goes along the cables
+    const t0 = XS[0] + 0.02, t1 = XS[XS.length - 1] + RW - 0.02
+    for (const y of [TRAY - 0.016, TRAY + 0.016]) b.f.lines.push({ c: b.curve([[t0, y], [t1, y]]), a: 0.16, at: 0.86 })
+    for (let x = t0; x <= t1 + 0.001; x += (t1 - t0) / 36) b.f.lines.push({ c: b.curve([[x, TRAY - 0.016], [x, TRAY + 0.016]]), a: 0.07, at: 0.86 })
+    for (const x of LANES) b.f.lines.push({ c: b.curve([[x, TRAY + 0.016], [x, FL]]), a: 0.09, at: 0.84 })
+    b.from(0.9)
+    traffic(b, rand, 0.36, 0.3)
     b.dust()
-    // blossom and the dust in the air come last
-    for (let i = 0; i < n; i++) if (b.f.cv[i] < 0) b.f.cu[i] = 0.97 + rand() * 0.14
     return b.f
 }
 
@@ -327,53 +416,46 @@ export function certFig(n: number, rand: Rand): Fig {
     return b.f
 }
 
-/* the end: everything settles into one line */
-/* the last screen: the roots of the tree the page began with, under the ground the last words stand on.
-   They are made the way the tree is — every tip has a route back to where the trunk comes down — but
-   turned over, spread wide and less regular; and what moves in them moves up, toward the trunk. */
+/* the last screen: the backs of the same racks — the other side of the first screen, the way the roots were the other
+   side of the tree. Seen from behind the row is the other way round. Every server's cable leaves from its back, goes to
+   the manager beside its rack and up out of the top; the cables of each manager bundle and curve in together, and the one
+   bundle goes up and branches into the ways to reach him. What the servers send goes up the cables to them. */
+const BS = 0.88, BTOP = 0.3 // the racks at this size, and where their tops stand, in the last screen's box
+// the back of a unit: its outline, a power supply on the side away from the cables, its ports, and a busy link light
+function back(b: B, u: Unit, left: boolean, rand: Rand, dens: number) {
+    shell(b, u, rand, dens, u.kind > DISKS)
+    if (u.kind > DISKS) return
+    const dir = left ? 1 : -1, near = left ? u.x + 0.01 : u.x + u.w - 0.01, cy = u.y + u.h / 2
+    b.f.lines.push({ c: b.curve(rrect(left ? u.x + u.w - 0.04 : u.x + 0.008, u.y + u.h * 0.2, 0.032, u.h * 0.6, 0.002), true), a: 0.12 })
+    for (let k = 0; k < 3; k++) b.put(near + dir * (0.012 + k * 0.007), cy, 0.45, 0.85)
+    b.node(near + dir * 0.006, cy - u.h * 0.22, 0.7, false, false, undefined, 1 + rand())
+}
 // `reach`: where each of the ways to reach him is (the foot of each, in the box's units, above the box), so the
-// trunk can come up out of the ground and branch into them
-export function rootFig(n: number, rand: Rand, reach?: Pt[]): Fig {
-    const ar = 2.3, b = make(n, ar, rand)
-    const segs: { pts: Pt[]; from: number }[] = [], tips: { p: Pt; path: Pt[] }[] = [], forks: Pt[] = []
-    let far0 = 0
-    // grown upward like the tree, and turned over when it is fitted into the box
-    const grow = (p0: Pt, aIn: number, ang: number, len: number, depth: number, path: Pt[], far: number) => {
-        const p1: Pt = [p0[0] + Math.sin(ang) * len, p0[1] - Math.cos(ang) * len]
-        const seg = hermite(p0, aIn, p1, ang, len * 1.05)
-        segs.push({ pts: seg, from: far })
-        const here = path.concat(seg)
-        if (depth === 0) { tips.push({ p: p1, path: here }); far0 = Math.max(far0, far + len); return }
-        forks.push(p1)
-        const spread = (0.42 + 0.3 * rand()) * (0.8 + depth * 0.05)
-        // a root wanders, but never turns back up through the ground
-        for (const way of [-1, 1]) grow(p1, ang, Math.max(-1.45, Math.min(1.45, ang + way * spread * (0.8 + rand() * 0.4) + (rand() - 0.5) * 0.35)), len * (0.68 + rand() * 0.14), depth - 1, here, far + len)
-    }
-    ;([[-1.15, 0.3], [-0.4, 0.26], [0.35, 0.27], [1.1, 0.3]] as const).forEach(([a, len]) => grow([0, 0], a, a, len, 4, [], 0))
-    let x0 = 1e9, x1 = -1e9, y0 = 1e9
-    for (const s of segs) for (const p of s.pts) { x0 = Math.min(x0, p[0]); x1 = Math.max(x1, p[0]); y0 = Math.min(y0, p[1]) }
-    const top = 0.1, k = Math.min((ar * 0.94) / (x1 - x0), 0.84 / -y0), ox = ar / 2 - ((x0 + x1) / 2) * k
-    const fit = (p: Pt): Pt => [p[0] * k + ox, top - p[1] * k]
-    for (const s of segs) b.f.lines.push({ c: b.curve(s.pts.map(fit)), a: 0.32 - 0.2 * (s.from / far0) })
-    for (const t of tips) { b.f.paths.push(b.curve(t.path.map(fit))); const p = fit(t.p); b.node(p[0], p[1], 1.2) }
-    for (const f of forks) { const q = fit(f); b.node(q[0], q[1], 0.9) }
-    // the ground
-    const root = fit([0, 0]), ground = b.curve([[ar * 0.06, top], [ar * 0.94, top]])
-    b.f.lines.push({ c: ground, a: 0.18 })
-    for (let q = b.count(0.035); q > 0; q--) b.run(ground, rand(), 0, 0.003, 0.18 + rand() * 0.35, 0.8)
-    // the trunk comes up out of it and branches, one branch into each of the ways to reach him; what the roots
-    // take up goes on up the trunk and out along the branches into them
-    if (reach?.length) {
-        const fork: Pt = [root[0], top - 0.45 * (top - Math.min(...reach.map((r) => r[1])))], trunk = b.curve([root, fork])
-        b.f.lines.push({ c: trunk, a: 0.34 })
-        for (let q = b.count(0.03); q > 0; q--) b.run(trunk, rand(), 0.25 + rand() * 0.2, 0.0045, 0.5 + rand() * 0.45)
-        const arms = reach.map((r) => b.curve(hermite(fork, 0, r, 0, Math.hypot(r[0] - fork[0], r[1] - fork[1]) * 0.9, 24)))
-        arms.forEach((c) => b.f.lines.push({ c, a: 0.28 }))
-        for (let q = b.count(0.05); q > 0; q--) b.run(arms[Math.floor(rand() * arms.length)], rand(), 0.3 + rand() * 0.25, 0.0035, 0.45 + rand() * 0.5, 1, rand() < 0.06 ? 1 : 0)
-    }
-    // what the roots take up goes toward the trunk; and the fine hair at every tip
-    for (let q = b.count(0.68); q > 0; q--) b.run(b.f.paths[Math.floor(rand() * tips.length)], rand(), -(0.03 + rand() * 0.04), 0.0035, 0.4 + rand() * 0.5, 0.8 + rand() * 0.6, rand() < 0.03 ? 1 : 0)
-    for (let q = b.count(0.2); q > 0; q--) { const p = fit(tips[Math.floor(rand() * tips.length)].p); b.put(p[0] + b.g() * 0.026, p[1] + b.g() * 0.022, 0.15 + rand() * 0.4, 0.8 + rand() * 0.4, rand() < 0.08 ? 1 : 0) }
+// bundle can branch into them
+export function backFig(n: number, rand: Rand, reach?: Pt[]): Fig {
+    const ar = 2.3, b = make(n, ar, rand), mid = ar / 2
+    const X = (x: number) => mid + BS * (0.75 - x), Y = (y: number) => BTOP + BS * (y - RT)
+    const racks = hall().map((r) => r.map((u) => ({ ...u, x: X(u.x + u.w), y: Y(u.y), w: BS * u.w, h: BS * u.h }))), lanes = LANES.map(X)
+    const base: Pt = [mid, 0.05], fork: Pt | undefined = reach?.length ? [mid, base[1] - 0.45 * (base[1] - Math.min(...reach.map((r) => r[1])))] : undefined
+    const up = (p: Pt, q: Pt, steps: number) => hermite(p, 0, q, 0, Math.hypot(q[0] - p[0], q[1] - p[1]) * 0.9, steps).slice(1)
+    // the cables come first: the port each leaves from is the node the pointer picks
+    racks.forEach((r, k) => {
+        const L = lanes[Math.min(k, lanes.length - 1)]
+        for (const u of r.filter((w) => w.kind <= DISKS)) {
+            const o = (rand() - 0.5) * 0.008, p: Pt = [L < u.x ? u.x + 0.01 : u.x + u.w - 0.01, u.y + u.h / 2], top: Pt = [L + o, BTOP - 0.025]
+            const pts: Pt[] = [p, [L + o, p[1]], top, ...up(top, [base[0] + o * 0.4, base[1]], 16)]
+            if (fork && reach) pts.push(fork, ...up(fork, reach[Math.floor(rand() * reach.length)], 20))
+            b.f.paths.push(b.curve(pts)); b.node(p[0], p[1], 1, false, false)
+        }
+    })
+    deck(b, [X(1.46), X(0.04), Y(FL)], rand, 0.02)
+    XS.forEach((x) => rack(b, [X(x + RW), Y(RT), BS * RW, BS * (FL - RT)], 0, rand, b.count(0.02)))
+    const all = racks.flat(), dens = b.count(0.2) / all.reduce((sum, u) => sum + 2 * (u.w + u.h), 0)
+    racks.forEach((r, k) => { const L = lanes[Math.min(k, lanes.length - 1)]; for (const u of r) back(b, u, L < u.x, rand, dens) })
+    // the managers, the bundles out of their tops into one, the one up to the fork, and its branches
+    for (const L of lanes) b.f.lines.push({ c: b.curve([[L, Y(FL) - 0.01], [L, BTOP - 0.025]]), a: 0.1 }, { c: b.curve([[L, BTOP - 0.025], ...up([L, BTOP - 0.025], base, 16)]), a: 0.24 })
+    if (fork && reach) { b.f.lines.push({ c: b.curve([base, fork]), a: 0.34 }); for (const r of reach) b.f.lines.push({ c: b.curve([fork, ...up(fork, r, 24)]), a: 0.28 }) }
+    traffic(b, rand, 0.55, 0.2)
     b.dust()
     return b.f
 }

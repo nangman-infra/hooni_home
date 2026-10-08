@@ -11,7 +11,7 @@ export const metadata: Metadata = {
 }
 
 /* One site, several looks, chosen when the server starts. All read the same content.ts.
-     (none)           the tree — words beside one figure of grains per section (morph; what is deployed)
+     (none)           the racks — words beside one figure of grains per section (morph; what is deployed)
      DESIGN=particle  the tree the camera circles — kept for reference
      DESIGN=ascii     the posters — kept for reference
      DESIGN=pixel     the terminal — the earlier site */

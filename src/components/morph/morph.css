@@ -30,15 +30,14 @@ html:has(.mo-site) { scroll-behavior: smooth; }
 /* the first and the last section stand on the centre line */
 .mo-mid { grid-template-columns: minmax(0, 1fr); justify-items: center; text-align: center; }
 .mo-mid .pa-in { justify-items: center; text-align: center; max-width: 44rem; }
-/* the first screen: the tree, as large as the window lets it be, and under it — where its root is —
+/* the first screen: the racks, as large as the window lets them be, and under them — on the floor they stand on —
    the name in plain type, what he is, and where to find him */
 .mo-mid.pa-open { padding-top: 4rem; padding-bottom: 3rem; row-gap: 1rem; }
-.mo-stage--tree { width: min(100%, 62rem, calc((100svh - 23rem) * 1.5)); height: auto; aspect-ratio: 3 / 2; }
+.mo-stage--top { width: min(100%, 62rem, calc((100svh - 23rem) * 1.5)); height: auto; aspect-ratio: 3 / 2; }
 .mo-name { margin: 0 0 0.5rem; padding-left: 0.16em; font: 300 clamp(1.4rem, 4.2vw, 3.6rem) / 1.1 var(--ui); letter-spacing: 0.16em; white-space: nowrap; }
 .mo-mid.pa-open .pa-cue { margin-top: 0.2rem; }
-/* the last screen: the ways to reach him at the top, and under them, down to the foot of the page, the roots */
-/* the last screen: the ways to reach him; under them the trunk of the tree, which comes up out of the ground and
-   reaches each of them; under the ground its roots; and at the foot of the page, how the site is built */
+/* the last screen: the ways to reach him; under them the bundle of cables, which comes up out of the floor and
+   reaches each of them; under the floor the cables; and at the foot of the page, how the site is built */
 .mo-last { padding-bottom: 1.6rem; row-gap: 0; }
 .mo-last .pa-in { margin-bottom: 3rem; }
 .mo-last > .pa-l { margin-top: 1rem; }
@@ -65,7 +64,7 @@ html:has(.mo-site) { scroll-behavior: smooth; }
     .mo-stage { order: -1; height: 36svh; }
     .mo-stage--media { height: auto; padding: 0.9rem 0.6rem; }
     .mo-mid { align-content: center; }
-    .mo-stage--tree, .mo-stage--end { order: 0; height: auto; }
+    .mo-stage--top, .mo-stage--end { order: 0; height: auto; }
     .mo-idx { display: none; }
     .mo-site .pa-top { display: none; }
 }

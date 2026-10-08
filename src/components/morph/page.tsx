@@ -68,7 +68,7 @@ export function MorphPage() {
 
             <main>
                 <section className="pa-hop mo-hop mo-mid pa-open" data-hop={0} data-title="" id="s-0">
-                    <div className="mo-stage mo-stage--tree" aria-hidden="true" />
+                    <div className="mo-stage mo-stage--top" aria-hidden="true" />
                     <div className="pa-in">
                         <h1 className="mo-name pa-l" style={{ "--i": 0 } as CSSProperties}>{ME.latin}</h1>
                         <p className="pa-role" style={{ "--i": 1 } as CSSProperties}>{ME.role}</p>
