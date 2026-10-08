@@ -191,6 +191,7 @@ export const CERTS = [
     { name: "NCP Certified Associate", issuer: "NAVER Cloud Platform" },
     { name: "SQLD", issuer: "SQL Developer" },
     { name: "ADSP", issuer: "데이터분석 준전문가" },
+    { name: "TOEIC Speaking AL", issuer: "ETS · Advanced Low" },
 ]
 
 export const BUILD = "Built by Jenkins, pushed to Harbor, pulled by Watchtower onto the website host in Daejeon."

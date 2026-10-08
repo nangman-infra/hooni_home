@@ -308,18 +308,20 @@ export function eduFig(n: number, rand: Rand, p: number, from: string, to: strin
 
 /* three marks */
 export function certFig(n: number, rand: Rand): Fig {
-    const ar = 1.25, b = make(n, ar, rand), W = 0.8, H = 0.22
-    // three certificates, one below and a little to the right of the last: a name, two lines of print, and a seal with a tick
+    const ar = 1.25, b = make(n, ar, rand), W = 0.8, many = CERTS.length, gaps = Math.max(1, many - 1)
+    // one certificate under the other, each a little to the right of the last, as many as there are (three keep the
+    // spacing they had): a name, two lines of print, and a seal with a tick. The grains are shared out among them.
+    const H = Math.min(0.22, 0.84 / many - 0.03), dy = (0.88 - H) / gaps, dx = Math.min(0.14, (ar - 0.12 - W) / gaps), k = H / 0.22, share = 3 / many
     CERTS.forEach((cert, i) => {
-        const x = 0.06 + i * 0.14, y = 0.06 + i * 0.33, sheet = b.curve(rrect(x, y, W, H, 0.028), true)
+        const x = 0.06 + i * dx, y = 0.06 + i * dy, sheet = b.curve(rrect(x, y, W, H, 0.028), true)
         b.f.lines.push({ c: sheet, a: 0.22 })
-        for (let q = b.count(0.2); q > 0; q--) b.run(sheet, rand(), 0.012 + rand() * 0.01, 0.0045, 0.35 + rand() * 0.5)
-        b.label(x + 0.055, y + 0.07, cert.name.toUpperCase(), "left")
-        for (const [w, dy] of [[0.4, 0.125], [0.29, 0.16]] as const) { const c = b.curve([[x + 0.055, y + dy], [x + 0.055 + w, y + dy]]); b.f.lines.push({ c, a: 0.13 }); for (let q = b.count(0.012); q > 0; q--) b.run(c, rand(), 0, 0.002, 0.2 + rand() * 0.25, 0.8) }
-        const sx = x + W - 0.115, sy = y + H / 2, seal = b.curve(circle(sx, sy, 0.058), true), tick = b.curve([[sx - 0.028, sy + 0.002], [sx - 0.008, sy + 0.022], [sx + 0.03, sy - 0.022]])
+        for (let q = b.count(0.2 * share); q > 0; q--) b.run(sheet, rand(), 0.012 + rand() * 0.01, 0.0045, 0.35 + rand() * 0.5)
+        b.label(x + 0.055, y + 0.07 * k, cert.name.toUpperCase(), "left")
+        for (const [w, at] of [[0.4, 0.125], [0.29, 0.16]] as const) { const c = b.curve([[x + 0.055, y + at * k], [x + 0.055 + w, y + at * k]]); b.f.lines.push({ c, a: 0.13 }); for (let q = b.count(0.012 * share); q > 0; q--) b.run(c, rand(), 0, 0.002, 0.2 + rand() * 0.25, 0.8) }
+        const sx = x + W - 0.115, sy = y + H / 2, seal = b.curve(circle(sx, sy, 0.058 * k), true), tick = b.curve([[sx - 0.028 * k, sy + 0.002 * k], [sx - 0.008 * k, sy + 0.022 * k], [sx + 0.03 * k, sy - 0.022 * k]])
         b.f.lines.push({ c: seal, a: 0.7, acc: true }, { c: tick, a: 0.9 })
-        for (let q = b.count(0.06); q > 0; q--) b.run(seal, rand(), 0.02 + rand() * 0.015, 0.006, 0.4 + rand() * 0.5, 1, 1)
-        for (let q = b.count(0.02); q > 0; q--) b.run(tick, rand(), 0, 0.003, 0.6 + rand() * 0.4)
+        for (let q = b.count(0.06 * share); q > 0; q--) b.run(seal, rand(), 0.02 + rand() * 0.015, 0.006, 0.4 + rand() * 0.5, 1, 1)
+        for (let q = b.count(0.02 * share); q > 0; q--) b.run(tick, rand(), 0, 0.003, 0.6 + rand() * 0.4)
     })
     b.dust()
     return b.f
